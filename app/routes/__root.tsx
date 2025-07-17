@@ -6,6 +6,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import appCss from "@/styles/app.css?url";
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -13,6 +15,12 @@ export const Route = createRootRoute({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
         title: "TanStack Start + Effect Starter",
+      },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
       },
     ],
   }),
