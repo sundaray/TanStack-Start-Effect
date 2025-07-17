@@ -5,5 +5,5 @@ export const Route = createFileRoute("/")({
 });
 
 export function Home() {
-  return "Hello World! This is my first Tanstack Start project.";
+  return <h1 className="text-2xl">Hello</h1>;
 }
