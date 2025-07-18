@@ -30,7 +30,7 @@ export const handleToolUploadForm = createServerFn({
 }).handler(async (ctx) => {
   try {
     const validatedData = serverValidate(ctx.data);
-    console.log("Form validated successfully: ");
+    console.log("Form validated successfully: ", validatedData);
   } catch (error) {
     if (error instanceof ServerValidateError) {
       console.log("Validation errors: ", error.response);

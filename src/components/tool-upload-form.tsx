@@ -18,6 +18,24 @@ interface ToolUploadFormProps {
   initialState: any;
 }
 
+// function toolFormValidator({ value }: { value: unknown }) {
+//   try {
+//     Schema.decodeUnknownSync(ToolUploadFormSchema, { errors: "all" })(value);
+//     return undefined; // Success, no errors
+//   } catch (error) {
+//     const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
+//     const fieldErrors: Record<string, string> = {};
+
+//     for (const issue of issues) {
+//       const path = issue.path.join(".");
+//       if (path && issue.message && !fieldErrors[path]) {
+//         fieldErrors[path] = issue.message;
+//       }
+//     }
+//     return { fields: fieldErrors };
+//   }
+// }
+
 export function ToolUploadForm({ initialState }: ToolUploadFormProps) {
   const form = useForm({
     ...formOpts,
@@ -28,48 +46,14 @@ export function ToolUploadForm({ initialState }: ToolUploadFormProps) {
       },
       [initialState]
     ),
-    validators: {
-      onBlur: function ({ value }) {
-        try {
-          const result = Schema.decodeUnknownSync(ToolUploadFormSchema, {
-            errors: "all",
-          })(value);
-          return undefined; // No errors
-        } catch (error) {
-          console.log("ParseError: ", error);
-          const issues = ParseResult.ArrayFormatter.formatErrorSync(error);
-
-          console.log("Issues: ", issues);
-          const fieldErrors: Record<string, string> = {};
-
-          // 3. Iterate over the structured issues to build the error object.
-          for (const issue of issues) {
-            const path = issue.path.join(".");
-            if (path && issue.message) {
-              // Assign the first error found for a given path
-              if (!fieldErrors[path]) {
-                fieldErrors[path] = issue.message;
-              }
-            }
-          }
-
-          console.log("Field errors: ", fieldErrors);
-
-          // 4. Return errors in the format Tanstack Form expects for field propagation.
-          return { fields: fieldErrors };
-        }
-      },
-    },
+    // validators: {
+    //   onBlur: toolFormValidator,
+    //   onChange: toolFormValidator,
+    // },
   });
 
   // Subscribe to form errors for display
   const formErrors = useStore(form.store, (formState) => {
-    console.log("📊 Form state updated:", {
-      errors: formState.errors,
-      canSubmit: formState.canSubmit,
-      isSubmitting: formState.isSubmitting,
-      values: formState.values,
-    });
     return formState.errors;
   });
 
@@ -105,7 +89,6 @@ export function ToolUploadForm({ initialState }: ToolUploadFormProps) {
         {/* Name Field - No individual validators needed! */}
         <form.Field name="name">
           {(field) => {
-            console.log("📝 Name field render - state:", field.state);
             return (
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Name</Label>
@@ -113,91 +96,56 @@ export function ToolUploadForm({ initialState }: ToolUploadFormProps) {
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
-                  onChange={function (e) {
-                    console.log("⌨️ Name field onChange:", e.target.value);
-                    // Always needed for TanStack Form to receive changes
+                  onChange={(e) => {
                     field.handleChange(e.target.value);
                   }}
-                  onBlur={function () {
-                    console.log("👁️ Name field onBlur triggered");
-                    console.log("👁️ Current name value:", field.state.value);
-                    // This will trigger form-level validation
-                    field.handleBlur();
-                  }}
+                  onBlur={field.handleBlur}
                   placeholder="Enter your name"
                 />
-                {/* Field-specific errors (automatically propagated from schema) */}
-                {field.state.meta.errors.map((error, index) => {
-                  console.log("❌ Name field error:", error);
-                  return (
-                    <p key={index} className="text-sm text-destructive">
-                      {error}
-                    </p>
-                  );
-                })}
+                {field.state.meta.errors.map((error) => (
+                  <p key={error} className="text-sm text-red-600">
+                    {error}
+                  </p>
+                ))}
               </div>
             );
           }}
         </form.Field>
 
-        {/* Website Field - No individual validators needed! */}
         <form.Field name="website">
           {(field) => {
-            console.log("🌐 Website field render - state:", field.state);
+            const error =
+              field.state.meta.errorMap.onChange ??
+              field.state.meta.errorMap.onBlur;
             return (
               <div className="space-y-2">
                 <Label htmlFor={field.name}>Website</Label>
                 <Input
                   id={field.name}
                   name={field.name}
-                  type="url"
+                  type="text"
                   value={field.state.value}
                   onChange={function (e) {
-                    console.log("⌨️ Website field onChange:", e.target.value);
-                    // Always needed for TanStack Form to receive changes
                     field.handleChange(e.target.value);
                   }}
-                  onBlur={function () {
-                    console.log("👁️ Website field onBlur triggered");
-                    console.log("👁️ Current website value:", field.state.value);
-                    // This will trigger form-level validation
-                    field.handleBlur();
-                  }}
+                  onBlur={field.handleBlur}
                   placeholder="https://example.com"
                 />
-                {/* Field-specific errors (automatically propagated from schema) */}
-                {field.state.meta.errors.map((error, index) => {
-                  console.log("❌ Website field error:", error);
-                  return (
-                    <p key={index} className="text-sm text-destructive">
-                      {error}
-                    </p>
-                  );
-                })}
+                {error ? <p className="text-sm text-red-600">{error}</p> : null}
               </div>
             );
           }}
         </form.Field>
 
-        {/* Submit Button */}
         <form.Subscribe
           selector={function (formState) {
             const result = [formState.canSubmit, formState.isSubmitting];
-            console.log("🔘 Submit button state:", {
-              canSubmit: result[0],
-              isSubmitting: result[1],
-            });
             return result;
           }}
         >
           {function ([canSubmit, isSubmitting]) {
             return (
-              <Button
-                type="submit"
-                disabled={!canSubmit}
-                className="w-full"
-                onClick={() => console.log("🖱️ Submit button clicked")}
-              >
+              <Button type="submit" disabled={!canSubmit} className="w-full">
                 {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             );
