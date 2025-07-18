@@ -30,6 +30,32 @@ export function ToolUploadForm({ initialState }: ToolUploadFormProps) {
       },
       [initialState]
     ),
+    validators: {
+      onChange: ({ value }) => {
+        // Client-side validation
+        const errors: Record<string, string> = {};
+
+        if (!value.name) {
+          errors.name = "Name is required";
+        }
+
+        if (!value.website) {
+          errors.website = "Website is required";
+        } else {
+          // Basic URL validation
+          try {
+            const url = value.website.startsWith("http")
+              ? value.website
+              : `https://${value.website}`;
+            new URL(url);
+          } catch {
+            errors.website = "Please enter a valid URL";
+          }
+        }
+
+        return Object.keys(errors).length > 0 ? { fields: errors } : undefined;
+      },
+    },
   });
 
   // Subscribe to form errors for display
@@ -37,17 +63,11 @@ export function ToolUploadForm({ initialState }: ToolUploadFormProps) {
 
   return (
     <div className="max-w-md mx-auto p-6 bg-card rounded-lg shadow-sm border">
-      <h2 className="text-2xl font-bold mb-6">Simple Form</h2>
+      <h2 className="text-2xl font-bold mb-6">Tool Upload Form</h2>
 
       <form
         action={handleToolUploadForm.url}
         method="post"
-        onSubmit={async (e) => {
-          console.log("🎯 Form submit event triggered");
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
         className="space-y-4"
       >
         {/* Display form-level errors */}
@@ -75,7 +95,7 @@ export function ToolUploadForm({ initialState }: ToolUploadFormProps) {
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                placeholder="Enter your name"
+                placeholder="Enter tool name"
                 aria-invalid={field.state.meta.errors.length > 0}
               />
               {field.state.meta.errors.length > 0 && (
