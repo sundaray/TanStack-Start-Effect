@@ -39,7 +39,9 @@ const FileSchema = (
 
 // --- The Main Form Schema ---
 export const ToolUploadFormSchema = Schema.Struct({
-  name: Schema.String,
+  name: Schema.String.pipe(
+    Schema.nonEmptyString({ message: () => "Name is required." })
+  ),
   website: Schema.String.pipe(
     Schema.nonEmptyString({ message: () => "Website URL is required." }),
     Schema.filter(
