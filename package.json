@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@conform-to/react": "^1.8.2",
+    "@conform-to/zod": "^1.8.2",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/postcss": "^4.1.11",
@@ -32,7 +34,8 @@
     "react-dom": "^19.1.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
-    "vite": "^7.0.5"
+    "vite": "^7.0.5",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@types/react": "^19.1.8",

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ToolUploadForm } from "@/components/tool-upload-form";
 import { getToolUploadFormData } from "@/lib/actions/tool-upload-action";
+import { ForgotPasswordForm } from "@/components/forgot-password-form";
 
 export const Route = createFileRoute("/submit")({
   loader: async () => {
@@ -16,7 +17,7 @@ export default function Submit() {
 
   return (
     <div className="container mx-auto py-8">
-      <ToolUploadForm initialState={formData} />
+      <ForgotPasswordForm />
     </div>
   );
 }

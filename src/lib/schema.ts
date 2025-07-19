@@ -107,3 +107,7 @@ export const ToolUploadFormSchema = Schema.Struct({
   //   { default: () => null }
   // ),
 });
+
+export const ForgotPasswordFormSchema = Schema.Struct({
+  password: Schema.String,
+});
