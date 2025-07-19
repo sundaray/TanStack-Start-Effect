@@ -7,10 +7,8 @@ import {
   useTransform,
   mergeForm,
 } from "@tanstack/react-form";
-import {
-  formOpts,
-  handleToolUploadForm,
-} from "@/lib/actions/tool-upload-action";
+import { handleToolUploadForm } from "@/lib/actions/tool-upload-action";
+import { toolUploadFormOpts } from "@/config/form-config";
 
 interface ToolUploadFormProps {
   initialState?: any;
@@ -18,7 +16,7 @@ interface ToolUploadFormProps {
 
 export function ToolUploadForm({ initialState }: ToolUploadFormProps) {
   const form = useForm({
-    ...formOpts,
+    ...toolUploadFormOpts,
     transform: useTransform(
       (baseForm) => {
         // This merges server validation state with client form

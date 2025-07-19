@@ -1,6 +1,5 @@
 import { Schema, ParseResult } from "effect";
 import { createServerFn } from "@tanstack/react-start";
-import { formOptions } from "@tanstack/react-form";
 import {
   createServerValidate,
   ServerValidateError,
@@ -8,18 +7,11 @@ import {
 } from "@tanstack/react-form/start";
 import { setResponseStatus } from "@tanstack/react-start/server";
 import { ToolUploadFormSchema } from "@/lib/schema";
-
-// Create form options that can be shared between client and server
-export const formOpts = formOptions({
-  defaultValues: {
-    name: "",
-    website: "",
-  },
-});
+import { toolUploadFormOpts } from "@/config/form-config";
 
 // Create server validation
 const serverValidate = createServerValidate({
-  ...formOpts,
+  ...toolUploadFormOpts,
   onServerValidate: ({ value }) => {
     console.log("🔍 Server validation running with value:", value);
 

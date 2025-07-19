@@ -109,5 +109,7 @@ export const ToolUploadFormSchema = Schema.Struct({
 });
 
 export const ForgotPasswordFormSchema = Schema.Struct({
-  password: Schema.String,
+  email: Schema.String.pipe(
+    Schema.nonEmptyString({ message: () => "Email is required." })
+  ),
 });
