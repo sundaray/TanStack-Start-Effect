@@ -62,6 +62,7 @@ export function ToolSubmissionForm() {
         reset();
       }
     } catch (error) {
+      console.log("Form submission error on client: ", error);
       if (isFormValidationError(error)) {
         error.issues.forEach((issue) => {
           const fieldName = issue.path[0] as keyof ToolSubmissionFormData;

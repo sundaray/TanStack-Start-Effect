@@ -1,30 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
 import { ToolSubmissionSchema, ToolSubmissionFormData } from "@/lib/schema";
-import { Effect, Schema, ParseResult, Exit, Cause, Either } from "effect";
+import { Effect, Schema, ParseResult, Exit, Cause, Data } from "effect";
 
-class FormValidationError extends Error {
-  constructor(
-    public readonly issues: ReadonlyArray<ParseResult.ArrayFormatterIssue>
-  ) {
-    super("Form validation failed.");
-    this.name = "FormValidationError";
-  }
-}
+class FormValidationError extends Data.TaggedError("FormValidationError")<{
+  readonly issues: ReadonlyArray<ParseResult.ArrayFormatterIssue>;
+}> {}
 
 function validateToolSubmission(data: unknown) {
-  return Effect.gen(function* () {
-    yield* Effect.log("Form data: ", data);
-    const validateData = yield* Schema.decodeUnknown(ToolSubmissionSchema, {
-      errors: "all",
-    })(data);
-    return validateData;
-  }).pipe(
-    Effect.tapErrorTag("ParseError", (error) =>
-      Effect.log(
-        "Formatted error:",
-        ParseResult.ArrayFormatter.formatErrorSync(error)
-      )
-    )
+  return Schema.decodeUnknown(ToolSubmissionSchema, {
+    errors: "all",
+  })(data).pipe(
+    Effect.mapError(
+      (error) =>
+        new FormValidationError({
+          issues: ParseResult.ArrayFormatter.formatErrorSync(error),
+        })
+    ),
+    Effect.tapErrorTag("FormValidationError", (error) => Effect.log(error))
   );
 }
 
@@ -37,22 +29,27 @@ function handleToolSubmission(data: ToolSubmissionFormData) {
 
 export const submitTool = createServerFn({ method: "POST" })
   .validator((data) => {
-    const validateEffect = validateToolSubmission(data);
-    const validateEffectWithTransformedError = validateEffect.pipe(
-      Effect.mapError((error) => {
-        const formattedIssues =
-          ParseResult.ArrayFormatter.formatErrorSync(error);
-        return new FormValidationError(formattedIssues);
-      })
-    );
-    const result = Effect.runSyncExit(validateEffectWithTransformedError);
-    if (Exit.isSuccess(result)) {
-      return result.value;
-    } else {
-      const error = Cause.failureOrCause(result.cause);
-      throw Either.isLeft(error)
-        ? error.left
-        : new Error("An unknown defect occurred.");
-    }
+    const validationEffect = validateToolSubmission(data);
+    const result = Effect.runSyncExit(validationEffect);
+
+    return Exit.match(result, {
+      onSuccess: (validatedData) => validatedData,
+      onFailure: (cause) => {
+        const failure = Cause.failureOption(cause);
+        if (
+          failure._tag === "Some" &&
+          failure.value instanceof FormValidationError
+        ) {
+          const error = {
+            name: "FormValidationError",
+            issues: failure.value.issues,
+          };
+          throw error;
+        }
+        throw new Error(
+          "An unexpected error occured on the server. please try again."
+        );
+      },
+    });
   })
   .handler(({ data }) => Effect.runPromise(handleToolSubmission(data)));
