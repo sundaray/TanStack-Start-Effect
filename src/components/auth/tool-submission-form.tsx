@@ -12,6 +12,21 @@ import { FormMessage } from "@/components/auth/form-message";
 import { FormFieldMessage } from "@/components/auth/form-field-message";
 import { getFieldErrorId } from "@/lib/utils";
 import axios from "axios";
+import { submitTool } from "@/lib/submit-tool";
+
+type FormValidationError = {
+  name: "FormValidationError";
+  issues: { path: string[]; message: string }[];
+};
+
+function isFormValidationError(error: unknown): error is FormValidationError {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    (error as any).name === "FormValidationError" &&
+    Array.isArray((error as any).issues)
+  );
+}
 
 export function ToolSubmissionForm() {
   const id = useId();
@@ -24,6 +39,7 @@ export function ToolSubmissionForm() {
     handleSubmit,
     formState: { errors },
     reset,
+    setError,
   } = useForm<ToolSubmissionFormData>({
     resolver: effectTsResolver(ToolSubmissionSchema),
     mode: "onTouched",
@@ -39,7 +55,28 @@ export function ToolSubmissionForm() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    console.log("Form data: ", data);
+    try {
+      const result = await submitTool({ data });
+      if (result.success && result.message) {
+        setSuccessMessage(result.message);
+        reset();
+      }
+    } catch (error) {
+      if (isFormValidationError(error)) {
+        error.issues.forEach((issue) => {
+          const fieldName = issue.path[0] as keyof ToolSubmissionFormData;
+          setError(fieldName, {
+            message: issue.message,
+          });
+        });
+      } else {
+        setErrorMessage(
+          "An unexpected error occured on the server. Please try again."
+        );
+      }
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const message = successMessage || errorMessage;

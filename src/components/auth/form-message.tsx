@@ -14,8 +14,8 @@ export function FormMessage({ message, type }: FormMessageProps) {
     <div
       className={cn(
         "rounded-md p-4 my-4",
-        type === "error" && "bg-red-50",
-        type === "success" && "bg-green-50"
+        type === "error" && "bg-red-100 border border-red-200",
+        type === "success" && "bg-green-100 border border-green-200"
       )}
     >
       <p
