@@ -212,13 +212,11 @@ export function ToolSubmissionForm() {
             const canAddMore = selectedCategories.length < 3;
 
             // Filter suggestions based on input
-            const filteredSuggestions = categoryInput.trim()
-              ? PREDEFINED_CATEGORIES.filter(
-                  (cat) =>
-                    !selectedCategories.includes(cat) &&
-                    cat.toLowerCase().includes(categoryInput.toLowerCase())
-                )
-              : [];
+            const filteredSuggestions = PREDEFINED_CATEGORIES.filter(
+              (cat) =>
+                !selectedCategories.includes(cat) &&
+                cat.toLowerCase().includes(categoryInput.toLowerCase())
+            );
 
             function addCategory(category: string) {
               const trimmedCategory = category.trim();
@@ -271,7 +269,7 @@ export function ToolSubmissionForm() {
                 {/* Category Input */}
                 {canAddMore && (
                   <div className="relative">
-                    <div className="relative">
+                    <div>
                       <Input
                         id="categories"
                         className="border-neutral-300 mt-2"
@@ -291,7 +289,13 @@ export function ToolSubmissionForm() {
                             setShowSuggestions(false);
                           }
                         }}
-                        onFocus={() => setShowSuggestions(true)}
+                        onFocus={() => {
+                          setShowSuggestions(true);
+                          // Show all categories when focusing with empty input
+                          if (!categoryInput) {
+                            setCategoryInput("");
+                          }
+                        }}
                         onBlur={() => {
                           field.onBlur();
                           // Delay to allow clicking on suggestions
@@ -307,52 +311,71 @@ export function ToolSubmissionForm() {
                         disabled={isProcessing}
                         autoComplete="off"
                       />
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-400">
-                        Press Enter to add
-                      </div>
                     </div>
 
                     {/* Suggestions Dropdown */}
-                    {showSuggestions && categoryInput && (
+                    {showSuggestions && (
                       <div className="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg max-h-48 overflow-y-auto">
-                        {filteredSuggestions.length > 0 ? (
+                        {categoryInput ? (
                           <>
-                            <div className="px-3 py-1.5 text-xs font-medium text-neutral-500 border-b">
-                              Suggested categories:
-                            </div>
-                            {filteredSuggestions.map((suggestion) => (
-                              <button
-                                key={suggestion}
-                                type="button"
-                                className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 focus:bg-neutral-50 focus:outline-none"
-                                onClick={() => addCategory(suggestion)}
-                              >
-                                {suggestion}
-                              </button>
-                            ))}
-                          </>
-                        ) : null}
+                            {/* Filtered suggestions */}
+                            {filteredSuggestions.length > 0 ? (
+                              filteredSuggestions.map((suggestion) => (
+                                <button
+                                  key={suggestion}
+                                  type="button"
+                                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+                                  onClick={() => addCategory(suggestion)}
+                                >
+                                  {suggestion}
+                                </button>
+                              ))
+                            ) : (
+                              /* No matches found */
+                              <div className="p-3 text-center text-sm text-gray-500">
+                                No matching categories
+                              </div>
+                            )}
 
-                        {/* Create new category option */}
-                        {categoryInput.trim() &&
-                          !PREDEFINED_CATEGORIES.some(
-                            (cat) =>
-                              cat.toLowerCase() === categoryInput.toLowerCase()
-                          ) && (
-                            <>
-                              {filteredSuggestions.length > 0 && (
-                                <div className="border-t" />
-                              )}
-                              <button
-                                type="button"
-                                className="w-full px-3 py-2 text-left text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center gap-2"
-                                onClick={() => addCategory(categoryInput)}
+                            {/* Create new category option */}
+                            {!PREDEFINED_CATEGORIES.some(
+                              (cat) =>
+                                cat.toLowerCase() ===
+                                categoryInput.toLowerCase()
+                            ) && (
+                              <div
+                                className={
+                                  filteredSuggestions.length > 0
+                                    ? "border-t"
+                                    : ""
+                                }
                               >
-                                <Plus className="size-4" />
-                                Create "{categoryInput}"
-                              </button>
-                            </>
-                          )}
+                                <button
+                                  type="button"
+                                  className="w-full px-3 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
+                                  onClick={() => addCategory(categoryInput)}
+                                >
+                                  <Plus className="size-4" />
+                                  Create "{categoryInput}"
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          /* Show all available categories when no search input */
+                          PREDEFINED_CATEGORIES.filter(
+                            (cat) => !selectedCategories.includes(cat)
+                          ).map((category) => (
+                            <button
+                              key={category}
+                              type="button"
+                              className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+                              onClick={() => addCategory(category)}
+                            >
+                              {category}
+                            </button>
+                          ))
+                        )}
                       </div>
                     )}
                   </div>
@@ -367,7 +390,7 @@ export function ToolSubmissionForm() {
                 )}
 
                 {/* Help text - only show when no error and no categories selected */}
-                {selectedCategories.length === 0 && !fieldError && (
+                {selectedCategories.length === 0 && (
                   <p className="text-sm text-neutral-500 mt-1">
                     Start typing to search existing categories or create your
                     own.
