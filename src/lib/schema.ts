@@ -60,24 +60,18 @@ export const ToolUploadFormSchema = Schema.Struct({
       { message: () => "Please enter a valid URL (e.g., https://example.com)." }
     )
   ),
-  // tagline: Schema.String.pipe(
-  //   Schema.nonEmptyString({ message: () => "A tagline is required." }),
-  //   Schema.maxLength(100, {
-  //     message: () => "Tagline must be 100 characters or fewer.",
-  //   })
-  // ),
-  // categories: Schema.Array(
-  //   Schema.Trim.pipe(
-  //     Schema.nonEmptyString({ message: () => "Category name can't be empty." })
-  //   )
-  // ).pipe(
-  //   Schema.minItems(1, {
-  //     message: () => "Please select at least one category.",
-  //   }),
-  //   Schema.maxItems(3, {
-  //     message: () => "You can select a maximum of three categories.",
-  //   })
-  // ),
+  categories: Schema.Array(
+    Schema.Trim.pipe(
+      Schema.nonEmptyString({ message: () => "Category name can't be empty." })
+    )
+  ).pipe(
+    Schema.minItems(1, {
+      message: () => "Please select at least one category.",
+    }),
+    Schema.maxItems(3, {
+      message: () => "You can select a maximum of three categories.",
+    })
+  ),
   // pricingModel: Schema.Literal("Free", "Premium", "Freemium").annotations({
   //   message: () => ({
   //     message: "Please select a pricing model.",
@@ -128,6 +122,24 @@ export const ToolSubmissionSchema = Schema.Struct({
         message: () => "Please enter a valid website URL",
       }
     )
+  ),
+  tagline: Schema.String.pipe(
+    Schema.nonEmptyString({ message: () => "A tagline is required." }),
+    Schema.maxLength(100, {
+      message: () => "Tagline must be 100 characters or fewer.",
+    })
+  ),
+  categories: Schema.Array(
+    Schema.Trim.pipe(
+      Schema.nonEmptyString({ message: () => "Category name can't be empty." })
+    )
+  ).pipe(
+    Schema.minItems(1, {
+      message: () => "Please select at least one category.",
+    }),
+    Schema.maxItems(3, {
+      message: () => "You can select a maximum of three categories.",
+    })
   ),
 });
 
