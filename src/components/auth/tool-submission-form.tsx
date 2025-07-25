@@ -195,10 +195,10 @@ export function ToolSubmissionForm() {
         />
       </div>
       {/* Categories Field */}
-      <div className="space-y-2">
+      <div>
         <Label htmlFor="categories">
           Categories
-          <span className="ml-2 text-xs font-normal text-neutral-500">
+          <span className="text-xs font-normal text-neutral-500">
             (Select/create up to 3)
           </span>
         </Label>
@@ -241,7 +241,7 @@ export function ToolSubmissionForm() {
               <div>
                 {/* Selected Categories */}
                 {selectedCategories.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {selectedCategories.map((category, index) => (
                       <div
                         key={`${category}-${index}`}
@@ -390,7 +390,7 @@ export function ToolSubmissionForm() {
                 )}
 
                 {/* Help text - only show when no error and no categories selected */}
-                {selectedCategories.length === 0 && (
+                {selectedCategories.length < 3 && (
                   <p className="text-sm text-neutral-500 mt-1">
                     Start typing to search existing categories or create your
                     own.
