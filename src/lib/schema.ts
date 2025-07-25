@@ -39,46 +39,12 @@ const FileSchema = (
 
 // --- The Main Form Schema ---
 export const ToolUploadFormSchema = Schema.Struct({
-  name: Schema.String.pipe(
-    Schema.nonEmptyString({ message: () => "Name is required." })
-  ),
-  website: Schema.String.pipe(
-    Schema.nonEmptyString({ message: () => "Website URL is required." }),
-    Schema.filter(
-      (string) => {
-        try {
-          const normalizedUrl =
-            string.startsWith("http://") || string.startsWith("https://")
-              ? string
-              : `https://${string}`;
-          new URL(normalizedUrl);
-          return true;
-        } catch (error) {
-          return false;
-        }
-      },
-      { message: () => "Please enter a valid URL (e.g., https://example.com)." }
-    )
-  ),
-  categories: Schema.Array(
-    Schema.Trim.pipe(
-      Schema.nonEmptyString({ message: () => "Category name can't be empty." })
-    )
-  ).pipe(
-    Schema.minItems(1, {
-      message: () => "Please select at least one category.",
-    }),
-    Schema.maxItems(3, {
-      message: () => "You can select a maximum of three categories.",
-    })
-  ),
   // pricingModel: Schema.Literal("Free", "Premium", "Freemium").annotations({
   //   message: () => ({
   //     message: "Please select a pricing model.",
   //     override: true,
   //   }),
   // }),
-
   // logo: Schema.optionalWith(
   //   Schema.NullOr(
   //     FileSchema(MAX_LOGO_SIZE_IN_BYTES, {
@@ -89,7 +55,6 @@ export const ToolUploadFormSchema = Schema.Struct({
   //   ),
   //   { default: () => null }
   // ),
-
   // homePageScreenshot: Schema.optionalWith(
   //   Schema.NullOr(
   //     FileSchema(MAX_SCREENSHOT_SIZE_IN_BYTES, {
@@ -135,7 +100,7 @@ export const ToolSubmissionSchema = Schema.Struct({
     )
   ).pipe(
     Schema.minItems(1, {
-      message: () => "Please select at least one category.",
+      message: () => "Please select/create at least one category.",
     }),
     Schema.maxItems(3, {
       message: () => "You can select a maximum of three categories.",

@@ -13,7 +13,7 @@ import { FormFieldMessage } from "@/components/auth/form-field-message";
 import { getFieldErrorId } from "@/lib/utils";
 import axios from "axios";
 import { submitTool } from "@/lib/submit-tool";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Search } from "lucide-react";
 
 type FormValidationError = {
   name: "FormValidationError";
@@ -61,6 +61,8 @@ export function ToolSubmissionForm() {
     defaultValues: {
       name: "",
       website: "",
+      tagline: "",
+      categories: [],
     },
   });
 
@@ -174,9 +176,8 @@ export function ToolSubmissionForm() {
                 <Input
                   {...field}
                   id="tagline"
-                  className="mt-2"
+                  className="mt-2 border-neutral-300"
                   placeholder="Brief description of your tool"
-                  maxLength={100}
                   aria-invalid={fieldError ? "true" : "false"}
                   aria-describedby={fieldError ? fieldErrorId : undefined}
                   disabled={isProcessing}
@@ -197,8 +198,8 @@ export function ToolSubmissionForm() {
       <div className="space-y-2">
         <Label htmlFor="categories">
           Categories
-          <span className="ml-2 text-sm font-normal text-gray-500">
-            (Select up to 3)
+          <span className="ml-2 text-xs font-normal text-neutral-500">
+            (Select/create up to 3)
           </span>
         </Label>
         <Controller
@@ -239,7 +240,7 @@ export function ToolSubmissionForm() {
             }
 
             return (
-              <div className="space-y-3">
+              <div>
                 {/* Selected Categories */}
                 {selectedCategories.length > 0 && (
                   <div className="flex flex-wrap gap-2">
@@ -248,17 +249,19 @@ export function ToolSubmissionForm() {
                         key={`${category}-${index}`}
                         className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-sm"
                       >
-                        <span className="text-xs font-medium text-blue-600">
+                        <span className="text-sm text-blue-600">
                           {index === 0 ? "Primary" : `Secondary`}:
                         </span>
-                        <span className="text-blue-800">{category}</span>
+                        <span className="text-blue-600 font-medium">
+                          {category}
+                        </span>
                         <button
                           type="button"
                           onClick={() => removeCategory(category)}
-                          className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full p-0.5"
+                          className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full p-1.5"
                           aria-label={`Remove ${category}`}
                         >
-                          <X className="h-3 w-3" />
+                          <X className="size-4" />
                         </button>
                       </div>
                     ))}
@@ -271,6 +274,7 @@ export function ToolSubmissionForm() {
                     <div className="relative">
                       <Input
                         id="categories"
+                        className="border-neutral-300 mt-2"
                         value={categoryInput}
                         onChange={(e) => {
                           setCategoryInput(e.target.value);
@@ -289,12 +293,13 @@ export function ToolSubmissionForm() {
                         }}
                         onFocus={() => setShowSuggestions(true)}
                         onBlur={() => {
+                          field.onBlur();
                           // Delay to allow clicking on suggestions
                           setTimeout(() => setShowSuggestions(false), 200);
                         }}
                         placeholder={
                           selectedCategories.length === 0
-                            ? "Type to search or create a category"
+                            ? " "
                             : "Add another category"
                         }
                         aria-invalid={fieldError ? "true" : "false"}
@@ -302,7 +307,7 @@ export function ToolSubmissionForm() {
                         disabled={isProcessing}
                         autoComplete="off"
                       />
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-neutral-400">
                         Press Enter to add
                       </div>
                     </div>
@@ -312,14 +317,14 @@ export function ToolSubmissionForm() {
                       <div className="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg max-h-48 overflow-y-auto">
                         {filteredSuggestions.length > 0 ? (
                           <>
-                            <div className="px-3 py-1.5 text-xs font-medium text-gray-500 border-b">
-                              Suggested Categories
+                            <div className="px-3 py-1.5 text-xs font-medium text-neutral-500 border-b">
+                              Suggested categories:
                             </div>
                             {filteredSuggestions.map((suggestion) => (
                               <button
                                 key={suggestion}
                                 type="button"
-                                className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                                className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-50 focus:bg-neutral-50 focus:outline-none"
                                 onClick={() => addCategory(suggestion)}
                               >
                                 {suggestion}
@@ -343,7 +348,7 @@ export function ToolSubmissionForm() {
                                 className="w-full px-3 py-2 text-left text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center gap-2"
                                 onClick={() => addCategory(categoryInput)}
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="size-4" />
                                 Create "{categoryInput}"
                               </button>
                             </>
@@ -355,19 +360,19 @@ export function ToolSubmissionForm() {
 
                 {/* Max categories message */}
                 {!canAddMore && (
-                  <p className="text-sm text-gray-500 italic">
-                    Maximum of 3 categories reached
+                  <p className="text-sm text-neutral-500 mt-2">
+                    All set! You've selected/created 3 categories (maximum
+                    allowed).
                   </p>
                 )}
 
-                {/* Help text */}
-                {selectedCategories.length === 0 && (
-                  <p className="text-sm text-gray-500">
+                {/* Help text - only show when no error and no categories selected */}
+                {selectedCategories.length === 0 && !fieldError && (
+                  <p className="text-sm text-neutral-500 mt-1">
                     Start typing to search existing categories or create your
-                    own
+                    own.
                   </p>
                 )}
-
                 <FormFieldMessage
                   error={fieldError?.message}
                   errorId={fieldErrorId}
