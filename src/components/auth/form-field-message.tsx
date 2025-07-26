@@ -1,10 +1,13 @@
 type FormFieldMessageProps = {
-  error: string | undefined;
+  errorMessage: string | undefined;
   errorId: string;
 };
 
-export function FormFieldMessage({ error, errorId }: FormFieldMessageProps) {
-  if (!error) {
+export function FormFieldMessage({
+  errorMessage,
+  errorId,
+}: FormFieldMessageProps) {
+  if (!errorMessage) {
     // Return empty div to maintain consistent spacing
     return <div className="min-h-7" />;
   }
@@ -16,7 +19,7 @@ export function FormFieldMessage({ error, errorId }: FormFieldMessageProps) {
         role="alert"
         className="text-sm text-red-600 mt-1 ease-out animate-in fade-in-0"
       >
-        {error}
+        {errorMessage}
       </p>
     </div>
   );
