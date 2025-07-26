@@ -1,0 +1,207 @@
+import { useState } from "react";
+import { X, Plus, Search } from "lucide-react";
+
+export function CategoryInput() {
+  const [categoryInput, setCategoryInput] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  return (
+    <div>
+      <Controller
+        name="categories"
+        control={control}
+        render={function ({ field }) {
+          const fieldErrorId = getFieldErrorId(field.name, id);
+          const fieldError = errors[field.name];
+          const selectedCategories = field.value || [];
+          const canAddMore = selectedCategories.length < 3;
+
+          // Filter suggestions based on input
+          const filteredSuggestions = PREDEFINED_CATEGORIES.filter(
+            (cat) =>
+              !selectedCategories.includes(cat) &&
+              cat.toLowerCase().includes(categoryInput.toLowerCase())
+          );
+
+          function addCategory(category: string) {
+            const trimmedCategory = category.trim();
+            if (
+              trimmedCategory &&
+              !selectedCategories.includes(trimmedCategory) &&
+              canAddMore
+            ) {
+              field.onChange([...selectedCategories, trimmedCategory]);
+              setCategoryInput("");
+              setShowSuggestions(false);
+            }
+          }
+
+          function removeCategory(categoryToRemove: string) {
+            field.onChange(
+              selectedCategories.filter((cat) => cat !== categoryToRemove)
+            );
+          }
+
+          return (
+            <div>
+              {/* Selected Categories */}
+              {selectedCategories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {selectedCategories.map((category, index) => (
+                    <div
+                      key={`${category}-${index}`}
+                      className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-sm"
+                    >
+                      <span className="text-sm text-blue-600">
+                        {index === 0 ? "Primary" : `Secondary`}:
+                      </span>
+                      <span className="text-blue-600 font-medium">
+                        {category}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeCategory(category)}
+                        className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full p-1.5"
+                        aria-label={`Remove ${category}`}
+                      >
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Category Input */}
+              {canAddMore && (
+                <div className="relative">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400 pointer-events-none" />
+                    <Input
+                      id="categories"
+                      className="border-neutral-300 mt-2 pl-8"
+                      value={categoryInput}
+                      onChange={(e) => {
+                        setCategoryInput(e.target.value);
+                        setShowSuggestions(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (categoryInput.trim()) {
+                            addCategory(categoryInput);
+                          }
+                        }
+                        if (e.key === "Escape") {
+                          setShowSuggestions(false);
+                        }
+                      }}
+                      onFocus={() => {
+                        setShowSuggestions(true);
+                        // Show all categories when focusing with empty input
+                        if (!categoryInput) {
+                          setCategoryInput("");
+                        }
+                      }}
+                      onBlur={() => {
+                        field.onBlur();
+                        // Delay to allow clicking on suggestions
+                        setTimeout(() => setShowSuggestions(false), 200);
+                      }}
+                      placeholder={
+                        selectedCategories.length === 0
+                          ? ""
+                          : "Add another category"
+                      }
+                      aria-invalid={fieldError ? "true" : "false"}
+                      aria-describedby={fieldError ? fieldErrorId : undefined}
+                      disabled={isProcessing}
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  {/* Suggestions Dropdown */}
+                  {showSuggestions && (
+                    <div className="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg max-h-48 overflow-y-auto">
+                      {categoryInput ? (
+                        <>
+                          {/* Filtered suggestions */}
+                          {filteredSuggestions.length > 0 ? (
+                            filteredSuggestions.map((suggestion) => (
+                              <button
+                                key={suggestion}
+                                type="button"
+                                className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+                                onClick={() => addCategory(suggestion)}
+                              >
+                                {suggestion}
+                              </button>
+                            ))
+                          ) : (
+                            /* No matches found */
+                            <div className="p-3 text-center text-sm text-gray-500">
+                              No matching categories
+                            </div>
+                          )}
+
+                          {/* Create new category option */}
+                          {!PREDEFINED_CATEGORIES.some(
+                            (cat) =>
+                              cat.toLowerCase() === categoryInput.toLowerCase()
+                          ) && (
+                            <div
+                              className={
+                                filteredSuggestions.length > 0 ? "border-t" : ""
+                              }
+                            >
+                              <button
+                                type="button"
+                                className="w-full px-3 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
+                                onClick={() => addCategory(categoryInput)}
+                              >
+                                <Plus className="size-4" />
+                                Create "{categoryInput}"
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        /* Show all available categories when no search input */
+                        PREDEFINED_CATEGORIES.filter(
+                          (cat) => !selectedCategories.includes(cat)
+                        ).map((category) => (
+                          <button
+                            key={category}
+                            type="button"
+                            className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+                            onClick={() => addCategory(category)}
+                          >
+                            {category}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Max categories message */}
+              {!canAddMore && (
+                <p className="text-sm text-neutral-500 mt-2">
+                  All set! You've selected/created 3 categories (maximum
+                  allowed).
+                </p>
+              )}
+
+              {/* Help text - only show when no error and no categories selected */}
+              {selectedCategories.length < 3 && (
+                <p className="text-sm text-neutral-500 mt-1">
+                  Start typing to search existing categories or create your own.
+                </p>
+              )}
+            </div>
+          );
+        }}
+      />
+    </div>
+  );
+}
