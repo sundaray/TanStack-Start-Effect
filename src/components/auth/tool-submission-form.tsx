@@ -14,6 +14,7 @@ import { getFieldErrorId } from "@/lib/utils";
 import axios from "axios";
 import { submitTool } from "@/lib/submit-tool";
 import { X, Plus, Search } from "lucide-react";
+import { FormField } from "@/components/form-field";
 
 type FormValidationError = {
   name: "FormValidationError";
@@ -103,97 +104,35 @@ export function ToolSubmissionForm() {
       {message && <FormMessage message={message} type={messageType} />}
 
       {/* Name Field */}
-      <div>
-        <Label htmlFor="name">Name</Label>
-        <Controller
-          name="name"
-          control={control}
-          render={function ({ field }) {
-            const fieldErrorId = getFieldErrorId(field.name, id);
-            const fieldError = errors[field.name];
-            return (
-              <>
-                <Input
-                  {...field}
-                  id="name"
-                  className="mt-2 border-neutral-300"
-                  placeholder="Enter tool name"
-                  aria-invalid={fieldError ? "true" : "false"}
-                  aria-describedby={fieldError ? fieldErrorId : undefined}
-                  disabled={isProcessing}
-                />
-                <FormFieldMessage
-                  error={fieldError?.message}
-                  errorId={fieldErrorId}
-                />
-              </>
-            );
-          }}
-        />
-      </div>
+      <FormField
+        id="nam"
+        name="name"
+        label="Name"
+        type="text"
+        control={control}
+        disabled={isProcessing}
+      />
 
       {/* Website Field */}
-      <div>
-        <Label htmlFor="website">Website</Label>
-        <Controller
-          name="website"
-          control={control}
-          render={function ({ field }) {
-            const fieldErrorId = getFieldErrorId(field.name, id);
-            const fieldError = errors[field.name];
-            return (
-              <>
-                <Input
-                  {...field}
-                  id="website"
-                  className="mt-2 border-neutral-300"
-                  placeholder="https://example.com"
-                  aria-invalid={fieldError ? "true" : "false"}
-                  aria-describedby={fieldError ? fieldErrorId : undefined}
-                  disabled={isProcessing}
-                />
-                <FormFieldMessage
-                  error={fieldError?.message}
-                  errorId={fieldErrorId}
-                />
-              </>
-            );
-          }}
-        />
-      </div>
+      <FormField
+        id="website"
+        name="website"
+        label="Website"
+        type="url"
+        control={control}
+        disabled={isProcessing}
+      />
 
       {/* Tagline Field */}
-      <div>
-        <Label htmlFor="tagline">Tagline</Label>
-        <Controller
-          name="tagline"
-          control={control}
-          render={function ({ field }) {
-            const fieldErrorId = getFieldErrorId(field.name, id);
-            const fieldError = errors[field.name];
-            return (
-              <>
-                <Input
-                  {...field}
-                  id="tagline"
-                  className="mt-2 border-neutral-300"
-                  placeholder="Brief description of your tool"
-                  aria-invalid={fieldError ? "true" : "false"}
-                  aria-describedby={fieldError ? fieldErrorId : undefined}
-                  disabled={isProcessing}
-                />
-                {/* <div className="mt-1 text-sm text-gray-500">
-                  {field.value.length}/100 characters
-                </div> */}
-                <FormFieldMessage
-                  error={fieldError?.message}
-                  errorId={fieldErrorId}
-                />
-              </>
-            );
-          }}
-        />
-      </div>
+      <FormField
+        id="tagline"
+        name="tagline"
+        label="Tagline"
+        type="text"
+        control={control}
+        disabled={isProcessing}
+      />
+
       {/* Categories Field */}
       <div>
         <Label htmlFor="categories">
@@ -398,7 +337,7 @@ export function ToolSubmissionForm() {
                   </p>
                 )}
                 <FormFieldMessage
-                  error={fieldError?.message}
+                  errorMessage={fieldError?.message}
                   errorId={fieldErrorId}
                 />
               </div>

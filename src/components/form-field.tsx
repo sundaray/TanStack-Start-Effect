@@ -1,27 +1,29 @@
 import { useId } from "react";
-import { Controller, ControllerProps } from "react-hook-form";
+import { Controller, Control, FieldValues, FieldPath } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormFieldMessage } from "@/components/auth/form-field-message";
 import { getFieldErrorId } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
-type FormFieldProps = {
-  id: string;
-  name: string;
-  label: string;
-  className: string;
-  control: ControllerProps["control"];
-};
+type InputProps = React.ComponentPropsWithoutRef<"input">;
 
-export function FormField({
-  id,
+type FormFieldProps<TFieldValues extends FieldValues> = {
+  id: string;
+  name: FieldPath<TFieldValues>;
+  label: string;
+  className?: string;
+  control: Control<TFieldValues>;
+} & Omit<InputProps, "id" | "name">;
+
+export function FormField<TFieldValues extends FieldValues>({
+  id: propId,
   name,
   label,
   className,
   control,
   ...props
-}: FormFieldProps) {
+}: FormFieldProps<TFieldValues>) {
   const id = useId();
   return (
     <div>
@@ -36,7 +38,7 @@ export function FormField({
               <Input
                 {...field}
                 {...props}
-                id={id}
+                id={propId}
                 name={name}
                 className={cn("mt-2 border-neutral-300", className)}
                 aria-invalid={error ? "true" : "false"}
