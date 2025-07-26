@@ -269,10 +269,11 @@ export function ToolSubmissionForm() {
                 {/* Category Input */}
                 {canAddMore && (
                   <div className="relative">
-                    <div>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400 pointer-events-none" />
                       <Input
                         id="categories"
-                        className="border-neutral-300 mt-2"
+                        className="border-neutral-300 mt-2 pl-8"
                         value={categoryInput}
                         onChange={(e) => {
                           setCategoryInput(e.target.value);
@@ -303,7 +304,7 @@ export function ToolSubmissionForm() {
                         }}
                         placeholder={
                           selectedCategories.length === 0
-                            ? " "
+                            ? ""
                             : "Add another category"
                         }
                         aria-invalid={fieldError ? "true" : "false"}
