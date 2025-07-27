@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DropzoneInput } from "@/components/dropzone-input";
 
 type FormValidationError = {
   name: "FormValidationError";
@@ -68,7 +69,8 @@ export function ToolSubmissionForm() {
       tagline: "",
       description: "",
       categories: [],
-      // pricing: "",
+      logo: undefined,
+      homepageScreenshot: undefined,
     },
   });
 
@@ -190,6 +192,30 @@ export function ToolSubmissionForm() {
               ))}
             </SelectContent>
           </Select>
+        )}
+      />
+
+      {/* Logo Field */}
+      <FormField
+        id="logo"
+        name="logo"
+        label="Logo"
+        control={control}
+        disabled={isProcessing}
+        renderField={({ field }) => (
+          <DropzoneInput field={field} disabled={isProcessing} />
+        )}
+      />
+
+      {/* NEW: Homepage Screenshot Field */}
+      <FormField
+        id="homepageScreenshot"
+        name="homepageScreenshot"
+        label="Homepage Screenshot"
+        control={control}
+        disabled={isProcessing}
+        renderField={({ field }) => (
+          <DropzoneInput field={field} disabled={isProcessing} />
         )}
       />
 

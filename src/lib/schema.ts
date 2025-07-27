@@ -118,6 +118,8 @@ export const ToolSubmissionSchema = Schema.Struct({
       override: true,
     }),
   }),
+  logo: Schema.optional(Schema.instanceOf(File)),
+  homepageScreenshot: Schema.optional(Schema.instanceOf(File)),
 });
 
 export type ToolSubmissionFormData = Schema.Schema.Type<
