@@ -68,7 +68,7 @@ export function ToolSubmissionForm() {
       tagline: "",
       description: "",
       categories: [],
-      pricing: "",
+      // pricing: "",
     },
   });
 
