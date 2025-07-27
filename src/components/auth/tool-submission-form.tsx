@@ -11,6 +11,7 @@ import axios from "axios";
 import { submitTool } from "@/lib/submit-tool";
 import { FormField } from "@/components/form-field";
 import { CategoryInput } from "@/components/category-input";
+import { RichTextEditor } from "@/components/rich-text-editor";
 
 type FormValidationError = {
   name: "FormValidationError";
@@ -125,6 +126,18 @@ export function ToolSubmissionForm() {
         type="text"
         control={control}
         disabled={isProcessing}
+      />
+
+      {/* 3. Description Field */}
+      <FormField
+        id="description"
+        name="description"
+        label="Description"
+        control={control}
+        disabled={isProcessing}
+        renderField={({ field }) => (
+          <RichTextEditor field={field} disabled={isProcessing} />
+        )}
       />
 
       {/* Categories Field */}

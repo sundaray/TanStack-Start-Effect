@@ -94,6 +94,7 @@ export const ToolSubmissionSchema = Schema.Struct({
       message: () => "Tagline must be 100 characters or fewer.",
     })
   ),
+  description: Schema.optional(Schema.String),
   categories: Schema.Array(
     Schema.Trim.pipe(
       Schema.nonEmptyString({ message: () => "Category name can't be empty." })
@@ -105,7 +106,7 @@ export const ToolSubmissionSchema = Schema.Struct({
     Schema.maxItems(3, {
       message: () => "You can select a maximum of three categories.",
     })
-  ),  
+  ),
 });
 
 export type ToolSubmissionFormData = Schema.Schema.Type<
