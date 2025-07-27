@@ -105,7 +105,7 @@ export const ToolSubmissionSchema = Schema.Struct({
     Schema.maxItems(3, {
       message: () => "You can select a maximum of three categories.",
     })
-  ),
+  ),  
 });
 
 export type ToolSubmissionFormData = Schema.Schema.Type<

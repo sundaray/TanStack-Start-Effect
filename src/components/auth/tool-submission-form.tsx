@@ -26,7 +26,7 @@ function isFormValidationError(error: unknown): error is FormValidationError {
   );
 }
 
-const PREDEFINED_CATEGORIES = [
+export const PREDEFINED_CATEGORIES = [
   "Development",
   "Design",
   "Marketing",
@@ -134,8 +134,12 @@ export function ToolSubmissionForm() {
         label="Categories"
         control={control}
         disabled={isProcessing}
-        renderField={({ field }) => (
-          <CategoryInput {...field} disabled={isProcessing} />
+        renderField={({ field, fieldState }) => (
+          <CategoryInput
+            field={field}
+            fieldState={fieldState}
+            disabled={isProcessing}
+          />
         )}
       />
 

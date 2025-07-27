@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 type InputProps = React.ComponentPropsWithoutRef<"input">;
 
-type RenderFieldProps<
+export type RenderFieldProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
 > = {
