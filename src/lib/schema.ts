@@ -73,6 +73,19 @@ export const ForgotPasswordFormSchema = Schema.Struct({
   ),
 });
 
+export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
+
+const PricingOption = Schema.String.pipe(
+  Schema.filter(
+    (value): value is (typeof pricingOptions)[number] =>
+      pricingOptions.includes(value as any),
+    {
+      // This message is a fallback for a server-side error or manipulated data.
+      message: () => "Invalid pricing option selected.",
+    }
+  )
+);
+
 export const ToolSubmissionSchema = Schema.Struct({
   name: Schema.String.pipe(
     Schema.nonEmptyString({
@@ -94,7 +107,9 @@ export const ToolSubmissionSchema = Schema.Struct({
       message: () => "Tagline must be 100 characters or fewer.",
     })
   ),
-  description: Schema.optional(Schema.String),
+  description: Schema.String.pipe(
+    Schema.nonEmptyString({ message: () => "Please eneter a description." })
+  ),
   categories: Schema.Array(
     Schema.Trim.pipe(
       Schema.nonEmptyString({ message: () => "Category name can't be empty." })
@@ -106,6 +121,12 @@ export const ToolSubmissionSchema = Schema.Struct({
     Schema.maxItems(3, {
       message: () => "You can select a maximum of three categories.",
     })
+  ),
+  pricing: Schema.String.pipe(
+    // 1. This is the check that will run first on an empty form.
+    Schema.nonEmptyString({ message: () => "Please select a pricing model." }),
+    // 2. If the string is not empty, it will then be checked against our refinement.
+    Schema.extend(PricingOption)
   ),
 });
 

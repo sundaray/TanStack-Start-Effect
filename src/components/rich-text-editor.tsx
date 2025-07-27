@@ -45,21 +45,6 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
         <Italic className="size-4" />
       </Button>
 
-      {/* Heading 2 Button */}
-      <Button
-        type="button"
-        size="sm"
-        variant={
-          editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"
-        }
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        disabled={
-          !editor.can().chain().focus().toggleHeading({ level: 2 }).run()
-        }
-      >
-        <Heading2 className="size-4" />
-      </Button>
-
       {/* Heading 3 Button */}
       <Button
         type="button"
@@ -120,7 +105,7 @@ export function RichTextEditor<
       StarterKit.configure({
         // Only enable the extensions we need, and configure them.
         heading: {
-          levels: [2, 3], // Only allow H2 and H3
+          levels: [3], // Only allow H3
         },
         // You can disable extensions from the StarterKit if you don't need them.
         // For example, to disable blockquotes:

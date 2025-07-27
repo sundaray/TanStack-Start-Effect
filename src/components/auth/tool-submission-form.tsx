@@ -4,6 +4,7 @@ import { effectTsResolver } from "@hookform/resolvers/effect-ts";
 import {
   ToolSubmissionSchema,
   type ToolSubmissionFormData,
+  pricingOptions,
 } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
 import { FormMessage } from "@/components/auth/form-message";
@@ -12,6 +13,13 @@ import { submitTool } from "@/lib/submit-tool";
 import { FormField } from "@/components/form-field";
 import { CategoryInput } from "@/components/category-input";
 import { RichTextEditor } from "@/components/rich-text-editor";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type FormValidationError = {
   name: "FormValidationError";
@@ -58,7 +66,9 @@ export function ToolSubmissionForm() {
       name: "",
       website: "",
       tagline: "",
+      description: "",
       categories: [],
+      pricing: "",
     },
   });
 
@@ -153,6 +163,33 @@ export function ToolSubmissionForm() {
             fieldState={fieldState}
             disabled={isProcessing}
           />
+        )}
+      />
+
+      {/* Pricing Field */}
+      <FormField
+        id="pricing"
+        name="pricing"
+        label="Pricing"
+        control={control}
+        disabled={isProcessing}
+        renderField={({ field }) => (
+          <Select
+            onValueChange={field.onChange}
+            defaultValue={field.value}
+            disabled={isProcessing}
+          >
+            <SelectTrigger className="mt-2 border-neutral-300 w-full">
+              <SelectValue placeholder="Select a pricing model" />
+            </SelectTrigger>
+            <SelectContent>
+              {pricingOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
       />
 
