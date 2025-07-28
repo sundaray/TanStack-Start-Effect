@@ -145,7 +145,7 @@ export function RichTextEditor<
   });
 
   return (
-    <div className="mt-2 shadow-xs">
+    <div className="mt-2">
       <Toolbar editor={editor} disabled={!!disabled} />
       <EditorContent
         editor={editor}

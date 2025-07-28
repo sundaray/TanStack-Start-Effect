@@ -76,7 +76,7 @@ export function CategoryInput<
               <button
                 type="button"
                 onClick={() => removeCategory(category)}
-                className="text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-full p-1.5"
+                className="text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-full p-1.5"
                 aria-label={`Remove ${category}`}
               >
                 <X className="size-4" />
