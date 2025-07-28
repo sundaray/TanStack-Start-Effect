@@ -94,6 +94,7 @@ export function CategoryInput<
             <Input
               id="categories"
               className="border-neutral-300 mt-2 pl-8"
+              disabled={disabled}
               value={categoryInput}
               onChange={(e) => {
                 setCategoryInput(e.target.value);
@@ -127,7 +128,6 @@ export function CategoryInput<
               }
               aria-invalid={fieldError ? "true" : "false"}
               aria-describedby={fieldError ? fieldErrorId : undefined}
-              disabled={disabled}
               autoComplete="off"
             />
           </div>

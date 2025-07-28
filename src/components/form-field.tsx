@@ -22,8 +22,6 @@ export type RenderFieldProps<
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
-  "aria-invalid": "true" | "false";
-  "aria-describedby": string | undefined;
 };
 
 type FormFieldProps<
@@ -71,8 +69,6 @@ export function FormField<
                   field,
                   fieldState,
                   disabled: !!disabled,
-                  "aria-invalid": error ? "true" : "false",
-                  "aria-describedby": error ? fieldErrorId : undefined,
                 })
               ) : (
                 <Input
@@ -80,6 +76,7 @@ export function FormField<
                   {...props}
                   id={propId}
                   name={name}
+                  disabled={disabled}
                   className={cn("mt-2 border-neutral-300", className)}
                   aria-invalid={error ? "true" : "false"}
                   aria-describedby={error ? fieldErrorId : undefined}

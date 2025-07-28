@@ -1,25 +1,28 @@
-import { useCallback } from "react";
+import { useId, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { ControllerRenderProps } from "react-hook-form";
+import { ControllerRenderProps, ControllerFieldState } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
 import { UploadCloud, FileImage as FileImageIcon, X } from "lucide-react";
+import { getFieldErrorId } from "@/lib/utils";
 
 type DropzoneInputProps = {
   field: ControllerRenderProps<any, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  fieldState: ControllerFieldState;
   disabled: boolean;
-  "aria-invalid": "true" | "false";
-  "aria-describedby": string | undefined;
 };
 
 const MAX_FILE_SIZE = 50 * 1024; // 1MB
 
 export function DropzoneInput({
   field,
+  fieldState,
   disabled,
-  "aria-invalid": ariaInvalid,
-  "aria-describedby": ariaDescribedby,
 }: DropzoneInputProps) {
+  const id = useId();
+  const fieldErrorId = getFieldErrorId(field.name, id);
+  const fieldError = fieldState.error;
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
@@ -55,9 +58,8 @@ export function DropzoneInput({
       <div
         {...getRootProps({
           role: "button",
-          "aria-invalid": ariaInvalid,
-          ...(ariaDescribedby && { "aria-describedby": ariaDescribedby }),
-
+          "aria-invalid": fieldError ? "true" : "false",
+          "aria-describedby": fieldError ? fieldErrorId : undefined,
           className: cn(
             "flex cursor-pointer flex-col items-center justify-center rounded-md border-1 border-dashed border-neutral-300 p-8 text-center transition-colors hover:bg-neutral-50",
             isDragActive && "border-green-500 bg-green-50",

@@ -140,19 +140,11 @@ export function ToolSubmissionForm() {
         label="Description"
         control={control}
         disabled={isProcessing}
-        renderField={({
-          field,
-          fieldState,
-          disabled,
-          "aria-invalid": ariaInvalid,
-          "aria-describedby": ariaDescribedby,
-        }) => (
+        renderField={({ field, fieldState, disabled }) => (
           <RichTextEditor
             field={field}
             fieldState={fieldState}
             disabled={disabled}
-            aria-invalid={ariaInvalid}
-            aria-describedby={ariaDescribedby}
           />
         )}
       />
@@ -204,17 +196,11 @@ export function ToolSubmissionForm() {
         label="Logo"
         control={control}
         disabled={isProcessing}
-        renderField={({
-          field,
-          disabled,
-          "aria-invalid": ariaInvalid,
-          "aria-describedby": ariaDescribedby,
-        }) => (
+        renderField={({ field, fieldState, disabled }) => (
           <DropzoneInput
             field={field}
+            fieldState={fieldState}
             disabled={disabled}
-            aria-invalid={ariaInvalid}
-            aria-describedby={ariaDescribedby}
           />
         )}
       />
@@ -225,17 +211,11 @@ export function ToolSubmissionForm() {
         label="Homepage Screenshot"
         control={control}
         disabled={isProcessing}
-        renderField={({
-          field,
-          disabled,
-          "aria-invalid": ariaInvalid,
-          "aria-describedby": ariaDescribedby,
-        }) => (
+        renderField={({ field, fieldState, disabled }) => (
           <DropzoneInput
             field={field}
+            fieldState={fieldState}
             disabled={disabled}
-            aria-invalid={ariaInvalid}
-            aria-describedby={ariaDescribedby}
           />
         )}
       />

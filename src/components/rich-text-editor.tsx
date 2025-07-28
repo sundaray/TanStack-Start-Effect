@@ -1,3 +1,5 @@
+import { useId } from "react";
+import { getFieldErrorId } from "@/lib/utils";
 import { type Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Bold, Italic, List, ListOrdered, Heading3 } from "lucide-react";
@@ -34,7 +36,7 @@ const Toolbar = ({
         size="sm"
         variant={editor.isActive("bold") ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleBold().run()}
-        disabled={!editor.can().chain().focus().toggleBold().run()}
+        disabled={disabled || !editor.can().chain().focus().toggleBold().run()}
       >
         <Bold className="size-4" />
       </Button>
@@ -45,7 +47,9 @@ const Toolbar = ({
         size="sm"
         variant={editor.isActive("italic") ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        disabled={!editor.can().chain().focus().toggleItalic().run()}
+        disabled={
+          disabled || !editor.can().chain().focus().toggleItalic().run()
+        }
       >
         <Italic className="size-4" />
       </Button>
@@ -59,6 +63,7 @@ const Toolbar = ({
         }
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         disabled={
+          disabled ||
           !editor.can().chain().focus().toggleHeading({ level: 3 }).run()
         }
       >
@@ -71,7 +76,9 @@ const Toolbar = ({
         size="sm"
         variant={editor.isActive("bulletList") ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        disabled={!editor.can().chain().focus().toggleBulletList().run()}
+        disabled={
+          disabled || !editor.can().chain().focus().toggleBulletList().run()
+        }
       >
         <List className="size-4" />
       </Button>
@@ -82,7 +89,9 @@ const Toolbar = ({
         size="sm"
         variant={editor.isActive("orderedList") ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        disabled={!editor.can().chain().focus().toggleOrderedList().run()}
+        disabled={
+          disabled || !editor.can().chain().focus().toggleOrderedList().run()
+        }
       >
         <ListOrdered className="size-4" />
       </Button>
@@ -97,24 +106,18 @@ type RichTextEditorProps<
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
-  "aria-invalid": "true" | "false";
-  "aria-describedby": string | undefined;
 };
 
 export function RichTextEditor<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
->({
-  field,
-  fieldState,
-  disabled,
-  "aria-invalid": ariaInvalid,
-  "aria-describedby": ariaDescribedby,
-}: RichTextEditorProps<TFieldValues, TName>) {
-  const { invalid } = fieldState;
+>({ field, fieldState, disabled }: RichTextEditorProps<TFieldValues, TName>) {
+  const id = useId();
+  const fieldErrorId = getFieldErrorId(field.name, id);
+  const fieldError = fieldState.error;
 
   const editor = useEditor({
-    immediatelyRender: true,
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: {
@@ -123,36 +126,47 @@ export function RichTextEditor<
       }),
     ],
     content: (field.value as string) || "",
-
     onUpdate({ editor }) {
       const html = editor.isEmpty ? "" : editor.getHTML();
       field.onChange(html);
     },
-
     onBlur() {
       field.onBlur();
     },
-
     editorProps: {
       attributes: {
-        "aria-invalid": ariaInvalid,
-        ...(ariaDescribedby && { "aria-describedby": ariaDescribedby }),
         class: cn(
-          "prose prose-neutral prose-sm",
-          "min-h-[120px] max-h-96 overflow-y-auto w-full px-3 py-2 text-sm placeholder:text-muted-foreground border rounded-b-md border-neutral-300 focus-visible:outline-none focus-visible:border-ring transition focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-          "aria-invalid:border-destructive aria-invalid:focus-visible:ring-destructive/20",
-          disabled && "pointer-events-none cursor-not-allowed opacity-50"
+          "prose prose-neutral prose-sm max-w-none",
+          "min-h-[118px] px-3 py-2 outline-none"
         ),
       },
     },
-
     editable: !disabled,
   });
 
   return (
     <div className="mt-2 shadow-xs">
       <Toolbar editor={editor} disabled={!!disabled} />
-      <EditorContent editor={editor} />
+      <EditorContent
+        editor={editor}
+        className={cn(
+          "min-h-[120px] max-h-96 overflow-y-auto w-full text-sm",
+          "border border-neutral-300 rounded-b-md bg-transparent shadow-xs",
+          "transition-[color,box-shadow]",
+          // Normal focus styles
+          "has-[.tiptap:focus-visible]:border-ring",
+          "has-[.tiptap:focus-visible]:ring-ring/50",
+          "has-[.tiptap:focus-visible]:ring-[3px]",
+          // Error styles (override focus styles when there's an error)
+          fieldError && "border-destructive",
+          fieldError && "has-[.tiptap:focus-visible]:border-destructive",
+          fieldError && "has-[.tiptap:focus-visible]:ring-destructive/20",
+          // Disabled styles
+          disabled && "pointer-events-none cursor-not-allowed opacity-50"
+        )}
+        aria-invalid={fieldError ? "true" : "false"}
+        aria-describedby={fieldError ? fieldErrorId : undefined}
+      />
     </div>
   );
 }
