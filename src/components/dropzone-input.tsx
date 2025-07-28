@@ -1,23 +1,20 @@
-// src/components/dropzone-input.tsx
-
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { ControllerRenderProps } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
-import { UploadCloud, File as FileIcon, X } from "lucide-react";
+import { UploadCloud, FileImage as FileImageIcon, X } from "lucide-react";
 
 type DropzoneInputProps = {
   field: ControllerRenderProps<any, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   disabled?: boolean;
 };
 
-const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const MAX_FILE_SIZE = 50 * 1024; // 1MB
 
 export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      // We only take the first file, since maxFiles is 1
       if (acceptedFiles.length > 0) {
         field.onChange(acceptedFiles[0]);
       }
@@ -25,24 +22,24 @@ export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
     [field]
   );
 
-  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
-    onDrop,
-    accept: {
-      "image/jpeg": [],
-      "image/png": [],
-    },
-    maxSize: MAX_FILE_SIZE,
-    maxFiles: 1,
-    multiple: false,
-    disabled,
-    // Disable click to open file dialog, we'll trigger it with our button
-    noClick: true,
-  });
+  const { getRootProps, getInputProps, isDragActive, isDragReject, open } =
+    useDropzone({
+      onDrop,
+      accept: {
+        "image/jpeg": [],
+        "image/png": [],
+      },
+      maxSize: MAX_FILE_SIZE,
+      maxFiles: 1,
+      multiple: false,
+      disabled,
+      noClick: false,
+    });
 
   const selectedFile: File | null = field.value;
 
   const handleRemoveFile = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); // Prevent the dropzone from opening
+    e.stopPropagation();
     field.onChange(null);
   };
 
@@ -53,25 +50,18 @@ export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
         className={cn(
           "flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 p-8 text-center transition-colors",
           {
-            "border-blue-500 bg-blue-50": isDragActive,
+            "border-green-500 bg-green-50": isDragActive,
+            "border-red-500 bg-red-50": isDragReject,
             "hover:border-neutral-400": !disabled,
             "cursor-not-allowed opacity-50": disabled,
           }
         )}
       >
         <input {...getInputProps()} />
-        <UploadCloud className="mb-2 h-10 w-10 text-neutral-400" />
-        <p className="mb-2 text-sm text-neutral-600">
-          Drag 'n' drop file here or
+        <UploadCloud className="mb-2 size-8 text-neutral-400" />
+        <p className="mb-2 text-sm text-neutral-800">
+          Drag 'n' drop file here or click to select file
         </p>
-        <Button
-          type="button"
-          onClick={open}
-          disabled={disabled}
-          variant="outline"
-        >
-          Select File
-        </Button>
         <p className="mt-4 text-xs text-neutral-500">
           JPG & PNG image files only
           <br />
@@ -82,7 +72,7 @@ export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
       {selectedFile && (
         <div className="flex items-center justify-between rounded-md border border-neutral-200 bg-neutral-50 p-2">
           <div className="flex items-center gap-2">
-            <FileIcon className="h-5 w-5 text-neutral-500" />
+            <FileImageIcon className="size-5 text-neutral-500" />
             <div className="flex flex-col text-sm">
               <span className="font-medium text-neutral-800">
                 {selectedFile.name}
@@ -96,11 +86,11 @@ export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
             type="button"
             size="icon"
             variant="ghost"
-            className="h-7 w-7"
+            className="size-10 rounded-full hover:bg-neutral-100 text-neutral-500"
             onClick={handleRemoveFile}
             disabled={disabled}
           >
-            <X className="h-4 w-4" />
+            <X className="size-4" />
           </Button>
         </div>
       )}

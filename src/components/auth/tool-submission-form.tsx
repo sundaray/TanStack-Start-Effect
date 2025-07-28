@@ -107,7 +107,7 @@ export function ToolSubmissionForm() {
   const messageType = successMessage ? "success" : "error";
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
       {message && <FormMessage message={message} type={messageType} />}
 
       {/* Name Field */}

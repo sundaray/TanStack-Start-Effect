@@ -9,11 +9,11 @@ export function FormFieldMessage({
 }: FormFieldMessageProps) {
   if (!errorMessage) {
     // Return empty div to maintain consistent spacing
-    return <div className="min-h-7" />;
+    return <div className="w-full min-h-6" />;
   }
 
   return (
-    <div className="min-h-7">
+    <div className="w-full min-h-6 flex items-center">
       <p
         id={errorId}
         role="alert"
