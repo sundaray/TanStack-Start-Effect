@@ -21,6 +21,9 @@ export type RenderFieldProps<
 > = {
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
+  disabled: boolean;
+  "aria-invalid": "true" | "false";
+  "aria-describedby": string | undefined;
 };
 
 type FormFieldProps<
@@ -47,6 +50,7 @@ export function FormField<
   className,
   control,
   renderField,
+  disabled,
   ...props
 }: FormFieldProps<TFieldValues, TName>) {
   const id = useId();
@@ -63,7 +67,13 @@ export function FormField<
           return (
             <>
               {typeof renderField === "function" ? (
-                renderField({ field, fieldState })
+                renderField({
+                  field,
+                  fieldState,
+                  disabled: !!disabled,
+                  "aria-invalid": error ? "true" : "false",
+                  "aria-describedby": error ? fieldErrorId : undefined,
+                })
               ) : (
                 <Input
                   {...field}

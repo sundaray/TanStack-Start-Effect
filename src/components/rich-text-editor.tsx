@@ -1,17 +1,33 @@
 import { type Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Bold, Italic, List, ListOrdered, Heading3 } from "lucide-react";
-import { ControllerRenderProps, FieldValues, FieldPath } from "react-hook-form";
+import {
+  ControllerRenderProps,
+  ControllerFieldState,
+  FieldValues,
+  FieldPath,
+} from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const Toolbar = ({ editor }: { editor: Editor | null }) => {
+const Toolbar = ({
+  editor,
+  disabled,
+}: {
+  editor: Editor | null;
+  disabled: boolean;
+}) => {
   if (!editor) {
     return null;
   }
 
   return (
-    <div className="flex items-center gap-1 p-2 border border-neutral-300 border-b-0 rounded-t-md">
+    <div
+      className={cn(
+        "flex items-center gap-1 p-2 border border-neutral-300 border-b-0 rounded-t-md",
+        disabled && "opacity-50"
+      )}
+    >
       {/* Bold Button */}
       <Button
         type="button"
@@ -79,19 +95,30 @@ type RichTextEditorProps<
   TName extends FieldPath<TFieldValues>,
 > = {
   field: ControllerRenderProps<TFieldValues, TName>;
-  disabled?: boolean;
+  fieldState: ControllerFieldState;
+  disabled: boolean;
+  "aria-invalid": "true" | "false";
+  "aria-describedby": string | undefined;
 };
 
 export function RichTextEditor<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
->({ field, disabled = false }: RichTextEditorProps<TFieldValues, TName>) {
+>({
+  field,
+  fieldState,
+  disabled,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedby,
+}: RichTextEditorProps<TFieldValues, TName>) {
+  const { invalid } = fieldState;
+
   const editor = useEditor({
-    immediatelyRender: false,
+    immediatelyRender: true,
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [3], // Only allow H3
+          levels: [3],
         },
       }),
     ],
@@ -108,9 +135,13 @@ export function RichTextEditor<
 
     editorProps: {
       attributes: {
+        "aria-invalid": ariaInvalid,
+        ...(ariaDescribedby && { "aria-describedby": ariaDescribedby }),
         class: cn(
           "prose prose-neutral prose-sm",
-          "min-h-[120px] max-h-96 overflow-y-auto w-full px-3 py-2 text-sm placeholder:text-muted-foreground border rounded-b-md border-neutral-300 focus-visible:outline-none focus-visible:border-ring transition focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+          "min-h-[120px] max-h-96 overflow-y-auto w-full px-3 py-2 text-sm placeholder:text-muted-foreground border rounded-b-md border-neutral-300 focus-visible:outline-none focus-visible:border-ring transition focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+          "aria-invalid:border-destructive aria-invalid:focus-visible:ring-destructive/20",
+          disabled && "pointer-events-none cursor-not-allowed opacity-50"
         ),
       },
     },
@@ -119,8 +150,8 @@ export function RichTextEditor<
   });
 
   return (
-    <div className="mt-2">
-      <Toolbar editor={editor} />
+    <div className="mt-2 shadow-xs">
+      <Toolbar editor={editor} disabled={!!disabled} />
       <EditorContent editor={editor} />
     </div>
   );

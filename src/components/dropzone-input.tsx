@@ -7,12 +7,19 @@ import { UploadCloud, FileImage as FileImageIcon, X } from "lucide-react";
 
 type DropzoneInputProps = {
   field: ControllerRenderProps<any, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-  disabled?: boolean;
+  disabled: boolean;
+  "aria-invalid": "true" | "false";
+  "aria-describedby": string | undefined;
 };
 
 const MAX_FILE_SIZE = 50 * 1024; // 1MB
 
-export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
+export function DropzoneInput({
+  field,
+  disabled,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedby,
+}: DropzoneInputProps) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
@@ -46,20 +53,22 @@ export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
   return (
     <div className="mt-2 grid gap-2">
       <div
-        {...getRootProps()}
-        className={cn(
-          "flex cursor-pointer flex-col items-center justify-center rounded-lg border-1 border-dashed border-neutral-300 p-8 text-center transition-colors hover:bg-neutral-50",
-          {
-            "border-green-500 bg-green-50": isDragActive,
-            "border-red-500 bg-red-50": isDragReject,
-            "hover:border-neutral-400": !disabled,
-            "cursor-not-allowed opacity-50": disabled,
-          }
-        )}
+        {...getRootProps({
+          role: "button",
+          "aria-invalid": ariaInvalid,
+          ...(ariaDescribedby && { "aria-describedby": ariaDescribedby }),
+
+          className: cn(
+            "flex cursor-pointer flex-col items-center justify-center rounded-md border-1 border-dashed border-neutral-300 p-8 text-center transition-colors hover:bg-neutral-50",
+            isDragActive && "border-green-500 bg-green-50",
+            isDragReject && "border-red-500 bg-red-50",
+            disabled && "cursor-not-allowed pointer-events-none opacity-50"
+          ),
+        })}
       >
         <input {...getInputProps()} />
         <UploadCloud className="mb-2 size-8 text-neutral-400" />
-        <p className="mb-2 text-sm text-neutral-800">
+        <p className="mb-2 text-sm text-neutral-700">
           Drag 'n' drop file here or click to select file
         </p>
         <p className="mt-4 text-xs text-neutral-500">
@@ -74,7 +83,7 @@ export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
           <div className="flex items-center gap-2">
             <FileImageIcon className="size-5 text-neutral-500" />
             <div className="flex flex-col text-sm">
-              <span className="font-medium text-neutral-800">
+              <span className="font-medium text-neutral-700">
                 {selectedFile.name}
               </span>
               <span className="text-xs text-neutral-500">

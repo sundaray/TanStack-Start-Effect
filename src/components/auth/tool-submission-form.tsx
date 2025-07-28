@@ -53,26 +53,21 @@ export function ToolSubmissionForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setError,
-  } = useForm<ToolSubmissionFormData>({
-    resolver: effectTsResolver(ToolSubmissionSchema),
-    mode: "onTouched",
-    reValidateMode: "onChange",
-    defaultValues: {
-      name: "",
-      website: "",
-      tagline: "",
-      description: "",
-      categories: [],
-      logo: undefined,
-      homepageScreenshot: undefined,
-    },
-  });
+  const { control, handleSubmit, reset, setError } =
+    useForm<ToolSubmissionFormData>({
+      resolver: effectTsResolver(ToolSubmissionSchema),
+      mode: "onTouched",
+      reValidateMode: "onChange",
+      defaultValues: {
+        name: "",
+        website: "",
+        tagline: "",
+        description: "",
+        categories: [],
+        logo: undefined,
+        homepageScreenshot: undefined,
+      },
+    });
 
   const onSubmit = async function (data: ToolSubmissionFormData) {
     setIsProcessing(true);
@@ -81,6 +76,9 @@ export function ToolSubmissionForm() {
 
     try {
       const result = await submitTool({ data });
+
+      console.log("Form data on client: ", data);
+
       if (result.success && result.message) {
         setSuccessMessage(result.message);
         reset();
@@ -99,7 +97,7 @@ export function ToolSubmissionForm() {
         );
       }
     } finally {
-      setIsProcessing(false);
+      // setIsProcessing(false);
     }
   };
 
@@ -110,9 +108,8 @@ export function ToolSubmissionForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
       {message && <FormMessage message={message} type={messageType} />}
 
-      {/* Name Field */}
       <FormField
-        id="nam"
+        id="name"
         name="name"
         label="Name"
         type="text"
@@ -120,17 +117,14 @@ export function ToolSubmissionForm() {
         disabled={isProcessing}
       />
 
-      {/* Website Field */}
       <FormField
         id="website"
         name="website"
         label="Website"
-        type="url"
         control={control}
         disabled={isProcessing}
       />
 
-      {/* Tagline Field */}
       <FormField
         id="tagline"
         name="tagline"
@@ -140,46 +134,55 @@ export function ToolSubmissionForm() {
         disabled={isProcessing}
       />
 
-      {/* 3. Description Field */}
       <FormField
         id="description"
         name="description"
         label="Description"
         control={control}
         disabled={isProcessing}
-        renderField={({ field }) => (
-          <RichTextEditor field={field} disabled={isProcessing} />
+        renderField={({
+          field,
+          fieldState,
+          disabled,
+          "aria-invalid": ariaInvalid,
+          "aria-describedby": ariaDescribedby,
+        }) => (
+          <RichTextEditor
+            field={field}
+            fieldState={fieldState}
+            disabled={disabled}
+            aria-invalid={ariaInvalid}
+            aria-describedby={ariaDescribedby}
+          />
         )}
       />
 
-      {/* Categories Field */}
       <FormField
         id="categories"
         name="categories"
         label="Categories"
         control={control}
         disabled={isProcessing}
-        renderField={({ field, fieldState }) => (
+        renderField={({ field, fieldState, disabled }) => (
           <CategoryInput
             field={field}
             fieldState={fieldState}
-            disabled={isProcessing}
+            disabled={disabled}
           />
         )}
       />
 
-      {/* Pricing Field */}
       <FormField
         id="pricing"
         name="pricing"
         label="Pricing"
         control={control}
         disabled={isProcessing}
-        renderField={({ field }) => (
+        renderField={({ field, disabled }) => (
           <Select
             onValueChange={field.onChange}
             defaultValue={field.value}
-            disabled={isProcessing}
+            disabled={disabled}
           >
             <SelectTrigger className="mt-2 border-neutral-300 w-full">
               <SelectValue placeholder="Select a pricing model" />
@@ -195,31 +198,48 @@ export function ToolSubmissionForm() {
         )}
       />
 
-      {/* Logo Field */}
       <FormField
         id="logo"
         name="logo"
         label="Logo"
         control={control}
         disabled={isProcessing}
-        renderField={({ field }) => (
-          <DropzoneInput field={field} disabled={isProcessing} />
+        renderField={({
+          field,
+          disabled,
+          "aria-invalid": ariaInvalid,
+          "aria-describedby": ariaDescribedby,
+        }) => (
+          <DropzoneInput
+            field={field}
+            disabled={disabled}
+            aria-invalid={ariaInvalid}
+            aria-describedby={ariaDescribedby}
+          />
         )}
       />
 
-      {/* NEW: Homepage Screenshot Field */}
       <FormField
         id="homepageScreenshot"
         name="homepageScreenshot"
         label="Homepage Screenshot"
         control={control}
         disabled={isProcessing}
-        renderField={({ field }) => (
-          <DropzoneInput field={field} disabled={isProcessing} />
+        renderField={({
+          field,
+          disabled,
+          "aria-invalid": ariaInvalid,
+          "aria-describedby": ariaDescribedby,
+        }) => (
+          <DropzoneInput
+            field={field}
+            disabled={disabled}
+            aria-invalid={ariaInvalid}
+            aria-describedby={ariaDescribedby}
+          />
         )}
       />
 
-      {/* Submit Button */}
       <Button type="submit" disabled={isProcessing}>
         {isProcessing ? "Submitting..." : "Submit Tool"}
       </Button>
