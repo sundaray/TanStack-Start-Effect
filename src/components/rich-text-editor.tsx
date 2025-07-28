@@ -1,6 +1,11 @@
 import { useId } from "react";
 import { getFieldErrorId } from "@/lib/utils";
-import { type Editor, EditorContent, useEditor } from "@tiptap/react";
+import {
+  type Editor,
+  EditorContent,
+  useEditor,
+  useEditorState,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Bold, Italic, List, ListOrdered, Heading3 } from "lucide-react";
 import {
@@ -19,6 +24,23 @@ const Toolbar = ({
   editor: Editor | null;
   disabled: boolean;
 }) => {
+  const {
+    isBold = false,
+    isItalic = false,
+    isH3 = false,
+    isBulletList = false,
+    isOrderedList = false,
+  } = useEditorState({
+    editor,
+    selector: ({ editor }) => ({
+      isBold: editor?.isActive("bold"),
+      isItalic: editor?.isActive("italic"),
+      isH3: editor?.isActive("heading", { level: 3 }),
+      isBulletList: editor?.isActive("bulletList"),
+      isOrderedList: editor?.isActive("orderedList"),
+    }),
+  }) || {};
+
   if (!editor) {
     return null;
   }
@@ -34,7 +56,7 @@ const Toolbar = ({
       <Button
         type="button"
         size="sm"
-        variant={editor.isActive("bold") ? "secondary" : "ghost"}
+        variant={isBold ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={disabled || !editor.can().chain().focus().toggleBold().run()}
       >
@@ -45,7 +67,7 @@ const Toolbar = ({
       <Button
         type="button"
         size="sm"
-        variant={editor.isActive("italic") ? "secondary" : "ghost"}
+        variant={isItalic ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={
           disabled || !editor.can().chain().focus().toggleItalic().run()
@@ -58,9 +80,7 @@ const Toolbar = ({
       <Button
         type="button"
         size="sm"
-        variant={
-          editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"
-        }
+        variant={isH3 ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         disabled={
           disabled ||
@@ -74,7 +94,7 @@ const Toolbar = ({
       <Button
         type="button"
         size="sm"
-        variant={editor.isActive("bulletList") ? "secondary" : "ghost"}
+        variant={isBulletList ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         disabled={
           disabled || !editor.can().chain().focus().toggleBulletList().run()
@@ -87,7 +107,7 @@ const Toolbar = ({
       <Button
         type="button"
         size="sm"
-        variant={editor.isActive("orderedList") ? "secondary" : "ghost"}
+        variant={isOrderedList ? "secondary" : "ghost"}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         disabled={
           disabled || !editor.can().chain().focus().toggleOrderedList().run()
@@ -136,8 +156,7 @@ export function RichTextEditor<
     editorProps: {
       attributes: {
         class: cn(
-          "prose prose-neutral prose-sm max-w-none",
-          "min-h-[118px] px-3 py-2 outline-none"
+          "prose prose-neutral prose-sm outline-none px-3 py-2 min-h-[119px] rounded-b-md"
         ),
       },
     },

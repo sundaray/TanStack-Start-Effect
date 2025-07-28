@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
 import { UploadCloud, FileImage as FileImageIcon, X } from "lucide-react";
 import { getFieldErrorId } from "@/lib/utils";
+import { PhotoIcon } from "@heroicons/react/24/solid";
 
 type DropzoneInputProps = {
   field: ControllerRenderProps<any, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -69,7 +70,7 @@ export function DropzoneInput({
         })}
       >
         <input {...getInputProps()} />
-        <UploadCloud className="mb-2 size-8 text-neutral-400" />
+        <PhotoIcon className="mb-2 size-10 text-neutral-300" />
         <p className="mb-2 text-sm text-neutral-700">
           Drag 'n' drop file here or click to select file
         </p>

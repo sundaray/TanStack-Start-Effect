@@ -52,7 +52,9 @@ export const ToolSubmissionSchema = Schema.Struct({
     }),
   }),
   logo: Schema.optional(Schema.instanceOf(File)),
-  homepageScreenshot: Schema.optional(Schema.instanceOf(File)),
+  homepageScreenshot: Schema.instanceOf(File).annotations({
+    message: () => "Homepage screenshot is required.",
+  }),
 });
 
 export type ToolSubmissionFormData = Schema.Schema.Type<
