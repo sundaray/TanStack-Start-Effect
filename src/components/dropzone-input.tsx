@@ -48,7 +48,7 @@ export function DropzoneInput({ field, disabled }: DropzoneInputProps) {
       <div
         {...getRootProps()}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-neutral-300 p-8 text-center transition-colors",
+          "flex cursor-pointer flex-col items-center justify-center rounded-lg border-1 border-dashed border-neutral-300 p-8 text-center transition-colors hover:bg-neutral-50",
           {
             "border-green-500 bg-green-50": isDragActive,
             "border-red-500 bg-red-50": isDragReject,

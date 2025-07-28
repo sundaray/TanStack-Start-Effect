@@ -24,13 +24,13 @@ export const ToolSubmissionSchema = Schema.Struct({
     )
   ),
   tagline: Schema.String.pipe(
-    Schema.nonEmptyString({ message: () => "A tagline is required." }),
+    Schema.nonEmptyString({ message: () => "Tagline is required." }),
     Schema.maxLength(100, {
       message: () => "Tagline must be 100 characters or fewer.",
     })
   ),
   description: Schema.String.pipe(
-    Schema.nonEmptyString({ message: () => "Please eneter a description." })
+    Schema.nonEmptyString({ message: () => "Description is required." })
   ),
   categories: Schema.Array(
     Schema.Trim.pipe(
@@ -47,7 +47,7 @@ export const ToolSubmissionSchema = Schema.Struct({
   pricing: Schema.Literal(...pricingOptions).annotations({
     identifier: "PricingModel",
     message: () => ({
-      message: "Please select a pricing model.",
+      message: "Pricing is required.",
       override: true,
     }),
   }),
