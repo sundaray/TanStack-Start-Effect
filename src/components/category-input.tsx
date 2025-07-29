@@ -69,16 +69,16 @@ export function CategoryInput<
           {selectedCategories.map((category: string, index: number) => (
             <div
               key={`${category}-${index}`}
-              className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-sm"
+              className="inline-flex items-center gap-2 rounded-full bg-neutral-700 px-3 py-1"
             >
-              <span className="text-sm text-blue-600">
+              <span className="text-xs text-neutral-300">
                 {index === 0 ? "Primary" : `Secondary`}:
               </span>
-              <span className="text-blue-600 font-medium">{category}</span>
+              <span className="text-neutral-100 text-xs">{category}</span>
               <button
                 type="button"
                 onClick={() => removeCategory(category)}
-                className="text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-full p-1.5 transition"
+                className="text-neutral-500 hover:text-neutral-300 hover:bg-neutral-600 rounded-full p-1.5 transition"
                 aria-label={`Remove ${category}`}
               >
                 <X className="size-4" />

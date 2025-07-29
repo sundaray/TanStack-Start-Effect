@@ -97,7 +97,7 @@ export function ToolSubmissionForm() {
         );
       }
     } finally {
-      // setIsProcessing(false);
+      setIsProcessing(false);
     }
   };
 
@@ -168,7 +168,7 @@ export function ToolSubmissionForm() {
         help={{
           message:
             "Start typing to search existing categories or create your own.",
-          maxItemsCount: 3,
+          maxCategoriesCount: 3,
         }}
         control={control}
         disabled={isProcessing}
@@ -212,6 +212,9 @@ export function ToolSubmissionForm() {
         name="logo"
         label="Logo"
         hint="Optional"
+        help={{
+          message: "JPG, PNG & WEBP image files only. Max. file size: 1MB.",
+        }}
         control={control}
         disabled={isProcessing}
         renderField={({ field, fieldState, disabled }) => (
@@ -227,6 +230,9 @@ export function ToolSubmissionForm() {
         id="homepageScreenshot"
         name="homepageScreenshot"
         label="Homepage Screenshot"
+        help={{
+          message: "JPG, PNG & WEBP image files only. Max. file size: 1MB.",
+        }}
         control={control}
         disabled={isProcessing}
         renderField={({ field, fieldState, disabled }) => (

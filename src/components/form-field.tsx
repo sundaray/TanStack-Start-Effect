@@ -36,7 +36,7 @@ type FormFieldProps<
   help?: {
     message: string;
     maxWordCount?: number;
-    maxItemsCount?: number;
+    maxCategoriesCount?: number;
   };
   className?: string;
   control: Control<TFieldValues>;
@@ -97,7 +97,7 @@ export function FormField<
           }
 
           let currentItemsCount = 0;
-          const showItemsCounter = help && help.maxItemsCount;
+          const showItemsCounter = help && help.maxCategoriesCount;
 
           if (showItemsCounter) {
             currentItemsCount = Array.isArray(field.value)
@@ -145,7 +145,7 @@ export function FormField<
                   {/* Item counter */}
                   {showItemsCounter && (
                     <span>
-                      {currentItemsCount} / {help.maxItemsCount}
+                      {currentItemsCount} / {help.maxCategoriesCount}
                     </span>
                   )}
                 </div>

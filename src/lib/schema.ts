@@ -8,6 +8,50 @@ export const ForgotPasswordFormSchema = Schema.Struct({
 
 export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
 
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+const formatMimeTypeForDisplay = (mimeType: string): string => {
+  if (!mimeType) {
+    return "UNKNOWN";
+  }
+  const parts = mimeType.split("/");
+  const format = parts[1] || parts[0] || "UNKNOWN";
+  return format.toUpperCase();
+};
+
+const FileSchema = (options: {
+  maxSizeInMb: number;
+  requiredMessage: string;
+}) =>
+  Schema.instanceOf(File, {
+    message: () => options.requiredMessage,
+  })
+    .pipe(
+      Schema.filter((file) => file.size <= options.maxSizeInMb * 1024 * 1024, {
+        message: (issue) => {
+          if (!(issue.actual instanceof File)) {
+            return "Invalid file provided.";
+          }
+          return `File size cannot exceed ${
+            options.maxSizeInMb
+          }MB. The selected file is ${(issue.actual.size / 1024 / 1024).toFixed(
+            2
+          )}MB.`;
+        },
+      })
+    )
+    .pipe(
+      Schema.filter((file) => ALLOWED_MIME_TYPES.includes(file.type), {
+        message: (issue) => {
+          if (!(issue.actual instanceof File)) {
+            return "Invalid file format provided.";
+          }
+          const providedType = formatMimeTypeForDisplay(issue.actual.type);
+          return `Invalid file format. Only JPG, PNG, or WEBP are allowed. You provided: ${providedType}`;
+        },
+      })
+    );
+
 export const ToolSubmissionSchema = Schema.Struct({
   name: Schema.String.pipe(
     Schema.nonEmptyString({
@@ -61,9 +105,15 @@ export const ToolSubmissionSchema = Schema.Struct({
       override: true,
     }),
   }),
-  logo: Schema.optional(Schema.instanceOf(File)),
-  homepageScreenshot: Schema.instanceOf(File).annotations({
-    message: () => "Homepage screenshot is required.",
+  logo: Schema.optional(
+    FileSchema({
+      maxSizeInMb: 2,
+      requiredMessage: "Logo is required.",
+    })
+  ),
+  homepageScreenshot: FileSchema({
+    maxSizeInMb: 5,
+    requiredMessage: "Homepage screenshot is required.",
   }),
 });
 
