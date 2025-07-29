@@ -165,6 +165,10 @@ export function ToolSubmissionForm() {
         id="categories"
         name="categories"
         label="Categories"
+        help={{
+          message:
+            "Start typing to search existing categories or create your own.",
+        }}
         control={control}
         disabled={isProcessing}
         renderField={({ field, fieldState, disabled }) => (

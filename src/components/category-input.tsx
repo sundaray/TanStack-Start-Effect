@@ -31,7 +31,9 @@ export function CategoryInput<
   const fieldError = fieldState.error;
 
   const selectedCategories = (field.value || []) as string[];
-  const canAddMore = selectedCategories.length < 3;
+  const reachedMaxCategories = selectedCategories.length >= 3;
+
+  const isDisabled = disabled || reachedMaxCategories;
 
   // Filter suggestions based on input
   const filteredSuggestions = PREDEFINED_CATEGORIES.filter(
@@ -45,7 +47,7 @@ export function CategoryInput<
     if (
       trimmedCategory &&
       !selectedCategories.includes(trimmedCategory) &&
-      canAddMore
+      !reachedMaxCategories
     ) {
       field.onChange([...selectedCategories, trimmedCategory]);
       setCategoryInput("");
@@ -76,7 +78,7 @@ export function CategoryInput<
               <button
                 type="button"
                 onClick={() => removeCategory(category)}
-                className="text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-full p-1.5"
+                className="text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-full p-1.5 transition"
                 aria-label={`Remove ${category}`}
               >
                 <X className="size-4" />
@@ -86,129 +88,111 @@ export function CategoryInput<
         </div>
       )}
 
-      {/* Category Input */}
-      {canAddMore && (
+      {/* Category input */}
+      <div className="relative">
         <div className="relative">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400 pointer-events-none" />
-            <Input
-              id="categories"
-              className="border-neutral-300 mt-2 pl-8"
-              disabled={disabled}
-              value={categoryInput}
-              onChange={(e) => {
-                setCategoryInput(e.target.value);
-                setShowSuggestions(true);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  if (categoryInput.trim()) {
-                    addCategory(categoryInput);
-                  }
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-400 pointer-events-none" />
+          <Input
+            id="categories"
+            className="border-neutral-300 mt-2 pl-8"
+            disabled={disabled}
+            value={categoryInput}
+            onChange={(e) => {
+              setCategoryInput(e.target.value);
+              setShowSuggestions(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (categoryInput.trim()) {
+                  addCategory(categoryInput);
                 }
-                if (e.key === "Escape") {
-                  setShowSuggestions(false);
-                }
-              }}
-              onFocus={() => {
-                setShowSuggestions(true);
-                // Show all categories when focusing with empty input
-                if (!categoryInput) {
-                  setCategoryInput("");
-                }
-              }}
-              onBlur={() => {
-                field.onBlur();
-                // Delay to allow clicking on suggestions
-                setTimeout(() => setShowSuggestions(false), 200);
-              }}
-              placeholder={
-                selectedCategories.length === 0 ? "" : "Add another category"
               }
-              aria-invalid={fieldError ? "true" : "false"}
-              aria-describedby={fieldError ? fieldErrorId : undefined}
-              autoComplete="off"
-            />
-          </div>
-
-          {/* Suggestions Dropdown */}
-          {showSuggestions && (
-            <div className="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg max-h-48 overflow-y-auto">
-              {categoryInput ? (
-                <>
-                  {/* Filtered suggestions */}
-                  {filteredSuggestions.length > 0 ? (
-                    filteredSuggestions.map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        type="button"
-                        className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
-                        onClick={() => addCategory(suggestion)}
-                      >
-                        {suggestion}
-                      </button>
-                    ))
-                  ) : (
-                    /* No matches found */
-                    <div className="p-3 text-center text-sm text-gray-500">
-                      No matching categories
-                    </div>
-                  )}
-
-                  {/* Create new category option */}
-                  {!PREDEFINED_CATEGORIES.some(
-                    (cat) => cat.toLowerCase() === categoryInput.toLowerCase()
-                  ) && (
-                    <div
-                      className={
-                        filteredSuggestions.length > 0 ? "border-t" : ""
-                      }
-                    >
-                      <button
-                        type="button"
-                        className="w-full px-3 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
-                        onClick={() => addCategory(categoryInput)}
-                      >
-                        <Plus className="size-4" />
-                        Create "{categoryInput}"
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : (
-                /* Show all available categories when no search input */
-                PREDEFINED_CATEGORIES.filter(
-                  (cat) => !selectedCategories.includes(cat)
-                ).map((category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
-                    onClick={() => addCategory(category)}
-                  >
-                    {category}
-                  </button>
-                ))
-              )}
-            </div>
-          )}
+              if (e.key === "Escape") {
+                setShowSuggestions(false);
+              }
+            }}
+            onFocus={() => {
+              setShowSuggestions(true);
+              // Show all categories when focusing with empty input
+              if (!categoryInput) {
+                setCategoryInput("");
+              }
+            }}
+            onBlur={() => {
+              field.onBlur();
+              // Delay to allow clicking on suggestions
+              setTimeout(() => setShowSuggestions(false), 200);
+            }}
+            placeholder={
+              selectedCategories.length === 0 ? "" : "Add another category"
+            }
+            aria-invalid={fieldError ? "true" : "false"}
+            aria-describedby={fieldError ? fieldErrorId : undefined}
+            autoComplete="off"
+          />
         </div>
-      )}
 
-      {/* Max categories message */}
-      {!canAddMore && (
-        <p className="text-sm text-neutral-500 mt-2">
-          All set! You've selected/created 3 categories (maximum allowed).
-        </p>
-      )}
+        {/* Suggestions Dropdown */}
+        {showSuggestions && !isDisabled && (
+          <div className="absolute z-10 mt-1 w-full rounded-md border bg-white shadow-lg max-h-48 overflow-y-auto">
+            {categoryInput ? (
+              <>
+                {/* Filtered suggestions */}
+                {filteredSuggestions.length > 0 ? (
+                  filteredSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+                      onClick={() => addCategory(suggestion)}
+                    >
+                      {suggestion}
+                    </button>
+                  ))
+                ) : (
+                  /* No matches found */
+                  <div className="p-3 text-center text-sm text-gray-500">
+                    No matching categories
+                  </div>
+                )}
 
-      {/* Help text - only show when no error and no categories selected */}
-      {selectedCategories.length < 3 && (
-        <p className="text-sm text-neutral-500 mt-1">
-          Start typing to search existing categories or create your own.
-        </p>
-      )}
+                {/* Create new category option */}
+                {!PREDEFINED_CATEGORIES.some(
+                  (cat) => cat.toLowerCase() === categoryInput.toLowerCase()
+                ) && (
+                  <div
+                    className={filteredSuggestions.length > 0 ? "border-t" : ""}
+                  >
+                    <button
+                      type="button"
+                      className="w-full px-3 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none flex items-center justify-center gap-2 transition-colors"
+                      onClick={() => addCategory(categoryInput)}
+                    >
+                      <Plus className="size-4" />
+                      Create "{categoryInput}"
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Show all available categories when no search input */
+              PREDEFINED_CATEGORIES.filter(
+                (cat) => !selectedCategories.includes(cat)
+              ).map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  className="w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+                  onClick={() => addCategory(category)}
+                >
+                  {category}
+                </button>
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
