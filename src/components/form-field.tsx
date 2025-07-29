@@ -142,7 +142,7 @@ export function FormField<
                       <span> / {help.maxWordCount} words</span>
                     </span>
                   )}
-                  {/* Item counter */}
+                  {/* Categories counter */}
                   {showItemsCounter && (
                     <span>
                       {currentItemsCount} / {help.maxCategoriesCount}

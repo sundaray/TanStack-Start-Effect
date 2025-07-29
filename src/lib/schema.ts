@@ -9,10 +9,12 @@ export const ForgotPasswordFormSchema = Schema.Struct({
 export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
 
 export const LOGO_MAX_SIZE_MB = 2;
-export const SCREENSHOT_MAX_SIZE_MB = 5;
-export const ACCEPTED_FILE_FORMATS = ["JPEG", "PNG", "WEBP"];
+export const SCREENSHOT_MAX_SIZE_MB = 0.04;
+export const SUPPORTED_FILE_TYPES = ["JPEG", "PNG"];
 
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
+export const SUPPORTED_MIME_TYPES = SUPPORTED_FILE_TYPES.map(
+  (format) => `image/${format.toLowerCase()}`
+);
 
 const formatMimeTypeForDisplay = (mimeType: string): string => {
   if (!mimeType) {
@@ -23,39 +25,37 @@ const formatMimeTypeForDisplay = (mimeType: string): string => {
   return format.toUpperCase();
 };
 
-const FileSchema = (options: {
-  maxSizeInMb: number;
-  requiredMessage: string;
-}) =>
-  Schema.instanceOf(File, {
-    message: () => options.requiredMessage,
-  })
-    .pipe(
-      Schema.filter((file) => file.size <= options.maxSizeInMb * 1024 * 1024, {
-        message: (issue) => {
-          if (!(issue.actual instanceof File)) {
-            return "Invalid file provided.";
-          }
-          return `File size cannot exceed ${
-            options.maxSizeInMb
-          }MB. The selected file is ${(issue.actual.size / 1024 / 1024).toFixed(
-            2
-          )}MB.`;
-        },
-      })
-    )
-    .pipe(
-      Schema.filter((file) => ALLOWED_MIME_TYPES.includes(file.type), {
-        message: (issue) => {
-          if (!(issue.actual instanceof File)) {
-            return "Invalid file format provided.";
-          }
-          const providedType = formatMimeTypeForDisplay(issue.actual.type);
-          return `Invalid file format. Only JPG, PNG, or WEBP are allowed. You provided: ${providedType}`;
-        },
-      })
-    );
+const validateFileContent = (maxSizeInMb: number) => {
+  const maxSizeInBytes = maxSizeInMb * 1024 * 1024;
+  const FileLike = Schema.Struct(
+    {
+      size: Schema.Number,
+      type: Schema.String,
+    },
+    { key: Schema.String, value: Schema.Unknown } // Allows other properties
+  );
 
+  return FileLike.pipe(
+    Schema.filter(
+      (file) =>
+        file.size <= maxSizeInBytes ||
+        `File size cannot exceed ${maxSizeInMb}MB. Current size: ${(
+          file.size /
+          1024 /
+          1024
+        ).toFixed(2)}MB`,
+      { identifier: "FileSize" }
+    ),
+    Schema.filter(
+      (file) =>
+        SUPPORTED_MIME_TYPES.includes(file.type) ||
+        `Invalid file type: ${formatMimeTypeForDisplay(
+          file.type
+        )}. Accepted formats: ${SUPPORTED_FILE_TYPES.join(", ")}`,
+      { identifier: "FileType" }
+    )
+  );
+};
 export const ToolSubmissionSchema = Schema.Struct({
   name: Schema.String.pipe(
     Schema.nonEmptyString({
@@ -110,17 +110,23 @@ export const ToolSubmissionSchema = Schema.Struct({
     }),
   }),
   logo: Schema.optional(
-    FileSchema({
-      maxSizeInMb: 2,
-      requiredMessage: "Logo is required.",
-    })
+    Schema.Union(validateFileContent(LOGO_MAX_SIZE_MB), Schema.Null)
   ),
-  homepageScreenshot: FileSchema({
-    maxSizeInMb: 5,
-    requiredMessage: "Homepage screenshot is required.",
-  }),
+  homepageScreenshot: Schema.Union(
+    validateFileContent(SCREENSHOT_MAX_SIZE_MB),
+    Schema.Null,
+    Schema.Undefined
+  ).pipe(
+    Schema.filter(
+      (value): value is { size: number; type: string } =>
+        value !== null && value !== undefined,
+      {
+        message: () => "Homepage screenshot is required.",
+      }
+    )
+  ),
 });
 
-export type ToolSubmissionFormData = Schema.Schema.Type<
+export type ToolSubmissionFormData = Schema.Schema.Encoded<
   typeof ToolSubmissionSchema
 >;

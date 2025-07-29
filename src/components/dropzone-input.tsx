@@ -20,7 +20,8 @@ type DropzoneInputProps<
   fieldState: ControllerFieldState;
   disabled: boolean;
   maxSizeInMb: number;
-  acceptedFileTypes: string[];
+  supportedFileTypes: string[];
+  supportedMimeTypes: string[];
 };
 
 export function DropzoneInput<
@@ -31,7 +32,8 @@ export function DropzoneInput<
   fieldState,
   disabled,
   maxSizeInMb,
-  acceptedFileTypes,
+  supportedFileTypes,
+  supportedMimeTypes,
 }: DropzoneInputProps<TFieldValues, TName>) {
   const id = useId();
   const fieldErrorId = getFieldErrorId(field.name, id);
@@ -43,14 +45,29 @@ export function DropzoneInput<
     }
   };
 
-  const { getRootProps, getInputProps, isDragActive, isDragReject } =
-    useDropzone({
-      onDrop,
-      maxFiles: 1,
-      multiple: false,
-      disabled,
-      noClick: false,
-    });
+  const maxSizeInBytes = maxSizeInMb * 1024 * 1024;
+
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragReject,
+    fileRejections,
+  } = useDropzone({
+    onDrop,
+    maxFiles: 1,
+    multiple: false,
+    disabled,
+    noClick: false,
+    accept: supportedMimeTypes.reduce(
+      (acc, mimeType) => {
+        acc[mimeType] = [];
+        return acc;
+      },
+      {} as Record<string, string[]>
+    ),
+    maxSize: maxSizeInBytes,
+  });
 
   const selectedFile: File | null = field.value;
 
@@ -67,7 +84,7 @@ export function DropzoneInput<
           "aria-invalid": fieldError ? "true" : "false",
           "aria-describedby": fieldError ? fieldErrorId : undefined,
           className: cn(
-            "flex cursor-pointer flex-col items-center justify-center rounded-md border-1 border-dashed border-neutral-300 p-12 text-center transition-colors hover:bg-neutral-50",
+            "flex cursor-pointer flex-col items-center justify-center rounded-md border-1 border-dashed aria-invalid:border-destructive aria-invalid:ring-destructive/20 border-neutral-300 p-12 text-center transition-colors",
             isDragActive && "border-green-500 bg-green-50",
             isDragReject && "border-red-500 bg-red-50",
             disabled && "cursor-not-allowed pointer-events-none opacity-50"
@@ -80,7 +97,7 @@ export function DropzoneInput<
           Drag 'n' drop file here or click to select file
         </p>
         <p className="text-xs text-neutral-500">
-          {acceptedFileTypes.join(", ")} images only
+          Supported file types: {supportedFileTypes.join(", ")}
         </p>
         <p className="text-xs text-neutral-500">
           Max. file size: {maxSizeInMb}MB

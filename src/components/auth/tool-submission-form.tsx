@@ -20,11 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getFieldErrorId } from "@/lib/utils";
+
 import { DropzoneInput } from "@/components/dropzone-input";
 import {
   LOGO_MAX_SIZE_MB,
   SCREENSHOT_MAX_SIZE_MB,
-  ACCEPTED_FILE_FORMATS,
+  SUPPORTED_FILE_TYPES,
+  SUPPORTED_MIME_TYPES,
 } from "@/lib/schema";
 
 type FormValidationError = {
@@ -69,12 +72,17 @@ export function ToolSubmissionForm() {
         tagline: "",
         description: "",
         categories: [],
+        pricing: undefined,
         logo: undefined,
         homepageScreenshot: undefined,
       },
     });
 
   const onSubmit = async function (data: ToolSubmissionFormData) {
+    console.log("Homepage screenshot value:", data.homepageScreenshot);
+    console.log("Is File instance?", data.homepageScreenshot instanceof File);
+    console.log("Type:", typeof data.homepageScreenshot);
+
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -192,24 +200,35 @@ export function ToolSubmissionForm() {
         label="Pricing"
         control={control}
         disabled={isProcessing}
-        renderField={({ id, field, disabled }) => (
-          <Select
-            onValueChange={field.onChange}
-            defaultValue={field.value}
-            disabled={disabled}
-          >
-            <SelectTrigger id={id} className="mt-2 border-neutral-300 w-full">
-              <SelectValue placeholder="Select a pricing model" />
-            </SelectTrigger>
-            <SelectContent>
-              {pricingOptions.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        renderField={({ id, field, fieldState, disabled }) => {
+          const randomId = useId();
+          const fieldErrorId = getFieldErrorId(field.name, randomId);
+          const fieldError = fieldState.error;
+
+          return (
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+              disabled={disabled}
+            >
+              <SelectTrigger
+                id={id}
+                className="mt-2 border-neutral-300 w-full"
+                aria-invalid={fieldError ? "true" : "false"}
+                aria-describedby={fieldError ? fieldErrorId : undefined}
+              >
+                <SelectValue placeholder="Select a pricing model" />
+              </SelectTrigger>
+              <SelectContent>
+                {pricingOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          );
+        }}
       />
 
       <FormField
@@ -225,7 +244,8 @@ export function ToolSubmissionForm() {
             fieldState={fieldState}
             disabled={disabled}
             maxSizeInMb={LOGO_MAX_SIZE_MB}
-            acceptedFileTypes={ACCEPTED_FILE_FORMATS}
+            supportedFileTypes={SUPPORTED_FILE_TYPES}
+            supportedMimeTypes={SUPPORTED_MIME_TYPES}
           />
         )}
       />
@@ -242,7 +262,8 @@ export function ToolSubmissionForm() {
             fieldState={fieldState}
             disabled={disabled}
             maxSizeInMb={SCREENSHOT_MAX_SIZE_MB}
-            acceptedFileTypes={ACCEPTED_FILE_FORMATS}
+            supportedFileTypes={SUPPORTED_FILE_TYPES}
+            supportedMimeTypes={SUPPORTED_MIME_TYPES}
           />
         )}
       />

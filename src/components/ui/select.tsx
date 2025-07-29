@@ -48,6 +48,8 @@ function SelectTrigger({
   );
 }
 
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
+
 function SelectContent({
   className,
   children,
