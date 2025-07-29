@@ -168,6 +168,7 @@ export function ToolSubmissionForm() {
         help={{
           message:
             "Start typing to search existing categories or create your own.",
+          maxItemsCount: 3,
         }}
         control={control}
         disabled={isProcessing}
@@ -186,13 +187,13 @@ export function ToolSubmissionForm() {
         label="Pricing"
         control={control}
         disabled={isProcessing}
-        renderField={({ field, disabled }) => (
+        renderField={({ id, field, disabled }) => (
           <Select
             onValueChange={field.onChange}
             defaultValue={field.value}
             disabled={disabled}
           >
-            <SelectTrigger className="mt-2 border-neutral-300 w-full">
+            <SelectTrigger id={id} className="mt-2 border-neutral-300 w-full">
               <SelectValue placeholder="Select a pricing model" />
             </SelectTrigger>
             <SelectContent>

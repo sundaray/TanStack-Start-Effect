@@ -36,6 +36,7 @@ type FormFieldProps<
   help?: {
     message: string;
     maxWordCount?: number;
+    maxItemsCount?: number;
   };
   className?: string;
   control: Control<TFieldValues>;
@@ -88,13 +89,21 @@ export function FormField<
 
           let currentWordCount = 0;
           let hasExceededLimit = false;
+          const showWordCounter = help && help.maxWordCount;
 
-          if (help && help.maxWordCount) {
+          if (showWordCounter) {
             currentWordCount = countWords(field.value);
-            hasExceededLimit = currentWordCount > help.maxWordCount;
+            hasExceededLimit = currentWordCount > help.maxWordCount!;
           }
 
-          const showWordCounter = help && help.maxWordCount;
+          let currentItemsCount = 0;
+          const showItemsCounter = help && help.maxItemsCount;
+
+          if (showItemsCounter) {
+            currentItemsCount = Array.isArray(field.value)
+              ? field.value.length
+              : 0;
+          }
 
           return (
             <>
@@ -120,6 +129,7 @@ export function FormField<
               {help && (
                 <div className="flex items-center justify-between mt-1 text-sm text-neutral-500">
                   <span>{help.message}</span>
+                  {/* Word counter */}
                   {showWordCounter && (
                     <span>
                       <span
@@ -130,6 +140,12 @@ export function FormField<
                         {currentWordCount}
                       </span>
                       <span> / {help.maxWordCount} words</span>
+                    </span>
+                  )}
+                  {/* Item counter */}
+                  {showItemsCounter && (
+                    <span>
+                      {currentItemsCount} / {help.maxItemsCount}
                     </span>
                   )}
                 </div>

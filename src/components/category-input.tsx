@@ -124,9 +124,7 @@ export function CategoryInput<
               // Delay to allow clicking on suggestions
               setTimeout(() => setShowSuggestions(false), 200);
             }}
-            placeholder={
-              selectedCategories.length === 0 ? "" : "Add another category"
-            }
+            placeholder="ex: Image upscaler, Image enhancer"
             aria-invalid={fieldError ? "true" : "false"}
             aria-describedby={fieldError ? fieldErrorId : undefined}
             autoComplete="off"
