@@ -19,6 +19,7 @@ export type RenderFieldProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
 > = {
+  id: string;
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
@@ -62,7 +63,18 @@ export function FormField<
   return (
     <div>
       <div className="flex justify-between">
-        <Label htmlFor={propId}>{label}</Label>
+        <Label
+          htmlFor={propId}
+          onClick={() => {
+            if (renderField) {
+              // For custom components like the RichTextEditor,
+              // we need to manually trigger the focus.
+              document.getElementById(propId)?.focus();
+            }
+          }}
+        >
+          {label}
+        </Label>
         {hint && (
           <span className="text-sm text-neutral-500 font-normal">{hint}</span>
         )}
@@ -88,40 +100,39 @@ export function FormField<
             <>
               {typeof renderField === "function" ? (
                 renderField({
+                  id: propId,
                   field,
                   fieldState,
                   disabled: !!disabled,
                 })
               ) : (
-                <>
-                  <Input
-                    {...field}
-                    {...props}
-                    id={propId}
-                    name={name}
-                    disabled={disabled}
-                    className={cn("mt-2 border-neutral-300", className)}
-                    aria-invalid={error ? "true" : "false"}
-                    aria-describedby={error ? fieldErrorId : undefined}
-                  />
-                  {help && (
-                    <div className="flex items-center justify-between mt-1 text-sm text-neutral-500">
-                      <span>{help.message}</span>
-                      {showWordCounter && (
-                        <span>
-                          <span
-                            className={cn(
-                              hasExceededLimit && "font-medium text-red-600"
-                            )}
-                          >
-                            {currentWordCount}
-                          </span>
-                          <span> / {help.maxWordCount} words</span>
-                        </span>
-                      )}
-                    </div>
+                <Input
+                  {...field}
+                  {...props}
+                  id={propId}
+                  name={name}
+                  disabled={disabled}
+                  className={cn("mt-2 border-neutral-300", className)}
+                  aria-invalid={error ? "true" : "false"}
+                  aria-describedby={error ? fieldErrorId : undefined}
+                />
+              )}
+              {help && (
+                <div className="flex items-center justify-between mt-1 text-sm text-neutral-500">
+                  <span>{help.message}</span>
+                  {showWordCounter && (
+                    <span>
+                      <span
+                        className={cn(
+                          hasExceededLimit && "font-medium text-red-600"
+                        )}
+                      >
+                        {currentWordCount}
+                      </span>
+                      <span> / {help.maxWordCount} words</span>
+                    </span>
                   )}
-                </>
+                </div>
               )}
               <FormFieldMessage
                 errorMessage={error?.message}

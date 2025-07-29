@@ -33,15 +33,23 @@ export const ToolSubmissionSchema = Schema.Struct({
     )
   ),
   description: Schema.String.pipe(
-    Schema.nonEmptyString({ message: () => "Description is required." })
+    Schema.nonEmptyString({ message: () => "Description is required." }),
+    Schema.filter(
+      (text) => text.trim().split(/\s+/).filter(Boolean).length <= 500,
+      {
+        message: () => "Description must be 500 words or fewer.",
+      }
+    )
   ),
   categories: Schema.Array(
     Schema.Trim.pipe(
-      Schema.nonEmptyString({ message: () => "Category name can't be empty." })
+      Schema.nonEmptyString({
+        message: () => "At least one category is required.",
+      })
     )
   ).pipe(
     Schema.minItems(1, {
-      message: () => "Please select/create at least one category.",
+      message: () => "At least one category is required.",
     }),
     Schema.maxItems(3, {
       message: () => "You can select a maximum of three categories.",

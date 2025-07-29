@@ -145,10 +145,15 @@ export function ToolSubmissionForm() {
         id="description"
         name="description"
         label="Description"
+        help={{
+          message: "Description must be 500 words or fewer.",
+          maxWordCount: 500,
+        }}
         control={control}
         disabled={isProcessing}
-        renderField={({ field, fieldState, disabled }) => (
+        renderField={({ id, field, fieldState, disabled }) => (
           <RichTextEditor
+            id={id}
             field={field}
             fieldState={fieldState}
             disabled={disabled}

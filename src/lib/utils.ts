@@ -18,10 +18,11 @@ export function formatBytes(bytes: number, decimals = 2): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
-export function countWords(text: string | undefined): number {
+export function countWords(text: string): number {
   if (!text || text.length === 0) {
     return 0;
   }
 
-  return text.trim().split(/\s+/).filter(Boolean).length;
+  const plainText = text.replace(/<[^>]*>/g, " ");
+  return plainText.trim().split(/\s+/).filter(Boolean).length;
 }

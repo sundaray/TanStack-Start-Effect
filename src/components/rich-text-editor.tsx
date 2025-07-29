@@ -123,6 +123,7 @@ type RichTextEditorProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
 > = {
+  id: string;
   field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
@@ -131,9 +132,14 @@ type RichTextEditorProps<
 export function RichTextEditor<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
->({ field, fieldState, disabled }: RichTextEditorProps<TFieldValues, TName>) {
-  const id = useId();
-  const fieldErrorId = getFieldErrorId(field.name, id);
+>({
+  id,
+  field,
+  fieldState,
+  disabled,
+}: RichTextEditorProps<TFieldValues, TName>) {
+  const randomId = useId();
+  const fieldErrorId = getFieldErrorId(field.name, randomId);
   const fieldError = fieldState.error;
 
   const editor = useEditor({
@@ -155,6 +161,7 @@ export function RichTextEditor<
     },
     editorProps: {
       attributes: {
+        id,
         class: cn(
           "prose prose-neutral prose-sm outline-none px-3 py-2 min-h-[119px] rounded-b-md"
         ),
