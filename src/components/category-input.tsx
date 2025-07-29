@@ -95,7 +95,7 @@ export function CategoryInput<
           <Input
             id="categories"
             className="border-neutral-300 mt-2 pl-8"
-            disabled={disabled}
+            disabled={isDisabled}
             value={categoryInput}
             onChange={(e) => {
               setCategoryInput(e.target.value);
