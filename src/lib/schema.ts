@@ -25,9 +25,12 @@ export const ToolSubmissionSchema = Schema.Struct({
   ),
   tagline: Schema.String.pipe(
     Schema.nonEmptyString({ message: () => "Tagline is required." }),
-    Schema.maxLength(100, {
-      message: () => "Tagline must be 100 characters or fewer.",
-    })
+    Schema.filter(
+      (text) => text.trim().split(/\s+/).filter(Boolean).length <= 20,
+      {
+        message: () => "Tagline must be 20 words or fewer.",
+      }
+    )
   ),
   description: Schema.String.pipe(
     Schema.nonEmptyString({ message: () => "Description is required." })

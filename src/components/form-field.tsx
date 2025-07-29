@@ -10,7 +10,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormFieldMessage } from "@/components/auth/form-field-message";
-import { getFieldErrorId } from "@/lib/utils";
+import { countWords, getFieldErrorId } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 type InputProps = React.ComponentPropsWithoutRef<"input">;
@@ -31,6 +31,11 @@ type FormFieldProps<
   id: string;
   name: TName;
   label: string;
+  hint?: string;
+  help?: {
+    message: string;
+    maxWordCount?: number;
+  };
   className?: string;
   control: Control<TFieldValues>;
   renderField?: (
@@ -45,6 +50,8 @@ export function FormField<
   id: propId,
   name,
   label,
+  hint,
+  help,
   className,
   control,
   renderField,
@@ -54,13 +61,28 @@ export function FormField<
   const id = useId();
   return (
     <div>
-      <Label htmlFor={id}>{label}</Label>
+      <div className="flex justify-between">
+        <Label htmlFor={id}>{label}</Label>
+        {hint && (
+          <span className="text-sm text-neutral-500 font-normal">{hint}</span>
+        )}
+      </div>
       <Controller
         name={name}
         control={control}
         render={({ field, fieldState }) => {
           const fieldErrorId = getFieldErrorId(field.name, id);
           const error = fieldState.error;
+
+          let currentWordCount = 0;
+          let hasExceededLimit = false;
+
+          if (help && help.maxWordCount) {
+            currentWordCount = countWords(field.value);
+            hasExceededLimit = currentWordCount > help.maxWordCount;
+          }
+
+          const showWordCounter = help && help.maxWordCount;
 
           return (
             <>
@@ -71,16 +93,35 @@ export function FormField<
                   disabled: !!disabled,
                 })
               ) : (
-                <Input
-                  {...field}
-                  {...props}
-                  id={propId}
-                  name={name}
-                  disabled={disabled}
-                  className={cn("mt-2 border-neutral-300", className)}
-                  aria-invalid={error ? "true" : "false"}
-                  aria-describedby={error ? fieldErrorId : undefined}
-                />
+                <>
+                  <Input
+                    {...field}
+                    {...props}
+                    id={propId}
+                    name={name}
+                    disabled={disabled}
+                    className={cn("mt-2 border-neutral-300", className)}
+                    aria-invalid={error ? "true" : "false"}
+                    aria-describedby={error ? fieldErrorId : undefined}
+                  />
+                  {help && (
+                    <div className="flex items-center justify-between mt-1 text-sm text-neutral-500">
+                      <span>{help.message}</span>
+                      {showWordCounter && (
+                        <span>
+                          <span
+                            className={cn(
+                              hasExceededLimit && "font-medium text-red-600"
+                            )}
+                          >
+                            {currentWordCount}
+                          </span>
+                          <span> / {help.maxWordCount} words</span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </>
               )}
               <FormFieldMessage
                 errorMessage={error?.message}

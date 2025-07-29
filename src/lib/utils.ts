@@ -17,3 +17,11 @@ export function formatBytes(bytes: number, decimals = 2): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
+
+export function countWords(text: string | undefined): number {
+  if (!text || text.length === 0) {
+    return 0;
+  }
+
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}

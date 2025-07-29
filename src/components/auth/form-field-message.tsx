@@ -8,7 +8,6 @@ export function FormFieldMessage({
   errorId,
 }: FormFieldMessageProps) {
   if (!errorMessage) {
-    // Return empty div to maintain consistent spacing
     return <div className="w-full min-h-6" />;
   }
 
