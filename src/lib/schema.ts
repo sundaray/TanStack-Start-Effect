@@ -8,6 +8,10 @@ export const ForgotPasswordFormSchema = Schema.Struct({
 
 export const pricingOptions = ["Free", "Paid", "Freemium"] as const;
 
+export const LOGO_MAX_SIZE_MB = 2;
+export const SCREENSHOT_MAX_SIZE_MB = 5;
+export const ACCEPTED_FILE_FORMATS = ["JPEG", "PNG", "WEBP"];
+
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 const formatMimeTypeForDisplay = (mimeType: string): string => {

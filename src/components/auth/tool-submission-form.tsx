@@ -21,6 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DropzoneInput } from "@/components/dropzone-input";
+import {
+  LOGO_MAX_SIZE_MB,
+  SCREENSHOT_MAX_SIZE_MB,
+  ACCEPTED_FILE_FORMATS,
+} from "@/lib/schema";
 
 type FormValidationError = {
   name: "FormValidationError";
@@ -212,9 +217,6 @@ export function ToolSubmissionForm() {
         name="logo"
         label="Logo"
         hint="Optional"
-        help={{
-          message: "JPG, PNG & WEBP image files only. Max. file size: 1MB.",
-        }}
         control={control}
         disabled={isProcessing}
         renderField={({ field, fieldState, disabled }) => (
@@ -222,6 +224,8 @@ export function ToolSubmissionForm() {
             field={field}
             fieldState={fieldState}
             disabled={disabled}
+            maxSizeInMb={LOGO_MAX_SIZE_MB}
+            acceptedFileTypes={ACCEPTED_FILE_FORMATS}
           />
         )}
       />
@@ -230,9 +234,6 @@ export function ToolSubmissionForm() {
         id="homepageScreenshot"
         name="homepageScreenshot"
         label="Homepage Screenshot"
-        help={{
-          message: "JPG, PNG & WEBP image files only. Max. file size: 1MB.",
-        }}
         control={control}
         disabled={isProcessing}
         renderField={({ field, fieldState, disabled }) => (
@@ -240,6 +241,8 @@ export function ToolSubmissionForm() {
             field={field}
             fieldState={fieldState}
             disabled={disabled}
+            maxSizeInMb={SCREENSHOT_MAX_SIZE_MB}
+            acceptedFileTypes={ACCEPTED_FILE_FORMATS}
           />
         )}
       />

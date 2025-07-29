@@ -1,23 +1,38 @@
 import { useId } from "react";
 import { useDropzone } from "react-dropzone";
-import { ControllerRenderProps, ControllerFieldState } from "react-hook-form";
+import {
+  ControllerRenderProps,
+  ControllerFieldState,
+  FieldValues,
+  FieldPath,
+} from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { cn, formatBytes } from "@/lib/utils";
 import { FileImage as FileImageIcon, X } from "lucide-react";
 import { getFieldErrorId } from "@/lib/utils";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 
-type DropzoneInputProps = {
-  field: ControllerRenderProps<any, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+type DropzoneInputProps<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+> = {
+  field: ControllerRenderProps<TFieldValues, TName>;
   fieldState: ControllerFieldState;
   disabled: boolean;
+  maxSizeInMb: number;
+  acceptedFileTypes: string[];
 };
 
-export function DropzoneInput({
+export function DropzoneInput<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+>({
   field,
   fieldState,
   disabled,
-}: DropzoneInputProps) {
+  maxSizeInMb,
+  acceptedFileTypes,
+}: DropzoneInputProps<TFieldValues, TName>) {
   const id = useId();
   const fieldErrorId = getFieldErrorId(field.name, id);
   const fieldError = fieldState.error;
@@ -61,20 +76,26 @@ export function DropzoneInput({
       >
         <input {...getInputProps()} />
         <PhotoIcon className="mb-2 size-10 text-neutral-300" />
-        <p className="mb-2 text-sm text-neutral-700">
+        <p className="mb-4 text-sm text-neutral-700">
           Drag 'n' drop file here or click to select file
+        </p>
+        <p className="text-xs text-neutral-500">
+          {acceptedFileTypes.join(", ")} images only
+        </p>
+        <p className="text-xs text-neutral-500">
+          Max. file size: {maxSizeInMb}MB
         </p>
       </div>
 
       {selectedFile && !fieldError && (
-        <div className="flex items-center justify-between rounded-md border border-neutral-200 bg-neutral-50 p-2">
+        <div className="flex items-center justify-between rounded-md border bg-neutral-700 p-2">
           <div className="flex items-center gap-2">
-            <FileImageIcon className="size-5 text-neutral-500" />
+            <FileImageIcon className="size-5 text-neutral-300" />
             <div className="flex flex-col text-sm">
-              <span className="font-medium text-neutral-700">
+              <span className="font-medium text-neutral-100">
                 {selectedFile.name}
               </span>
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-neutral-100">
                 {formatBytes(selectedFile.size)}
               </span>
             </div>
@@ -83,7 +104,7 @@ export function DropzoneInput({
             type="button"
             size="icon"
             variant="ghost"
-            className="size-10 rounded-full hover:bg-neutral-100 text-neutral-500"
+            className="size-10 rounded-full text-neutral-500 hover:text-neutral-300 hover:bg-neutral-600"
             onClick={handleRemoveFile}
             disabled={disabled}
           >
