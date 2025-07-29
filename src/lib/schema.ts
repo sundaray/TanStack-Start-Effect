@@ -48,7 +48,6 @@ export const ToolSubmissionSchema = Schema.Struct({
     })
   ),
   pricing: Schema.Literal(...pricingOptions).annotations({
-    identifier: "PricingModel",
     message: () => ({
       message: "Pricing is required.",
       override: true,

@@ -134,7 +134,7 @@ export function ToolSubmissionForm() {
         placeholder="ex: Upscale and enhance your images with AI Magic"
         help={{
           message: "Tagline must be 20 words or fewer.",
-          maxWordCount: 6,
+          maxWordCount: 20,
         }}
         type="text"
         control={control}

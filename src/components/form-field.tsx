@@ -62,7 +62,7 @@ export function FormField<
   return (
     <div>
       <div className="flex justify-between">
-        <Label htmlFor={id}>{label}</Label>
+        <Label htmlFor={propId}>{label}</Label>
         {hint && (
           <span className="text-sm text-neutral-500 font-normal">{hint}</span>
         )}
