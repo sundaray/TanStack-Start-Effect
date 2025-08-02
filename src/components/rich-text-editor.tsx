@@ -7,7 +7,14 @@ import {
   useEditorState,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Bold, Italic, List, ListOrdered, Heading3 } from "lucide-react";
+import {
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Heading3,
+  Scroll,
+} from "lucide-react";
 import {
   ControllerRenderProps,
   ControllerFieldState,
@@ -15,6 +22,7 @@ import {
   FieldPath,
 } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const Toolbar = ({
@@ -163,7 +171,7 @@ export function RichTextEditor<
       attributes: {
         id,
         class: cn(
-          "prose prose-neutral prose-sm outline-none px-3 py-2 min-h-[119px] rounded-b-md"
+          "prose prose-neutral prose-sm outline-none px-3 py-2 min-h-[240px] rounded-b-md"
         ),
       },
     },
@@ -173,10 +181,9 @@ export function RichTextEditor<
   return (
     <div className="mt-2">
       <Toolbar editor={editor} disabled={!!disabled} />
-      <EditorContent
-        editor={editor}
+      <ScrollArea
         className={cn(
-          "min-h-[120px] max-h-96 overflow-y-auto w-full text-sm",
+          "h-[240px] w-full text-sm",
           "border border-neutral-300 rounded-b-md bg-transparent shadow-xs",
           "transition-[color,box-shadow]",
           // Normal focus styles
@@ -190,9 +197,13 @@ export function RichTextEditor<
           // Disabled styles
           disabled && "pointer-events-none cursor-not-allowed opacity-50"
         )}
-        aria-invalid={fieldError ? "true" : "false"}
-        aria-describedby={fieldError ? fieldErrorId : undefined}
-      />
+      >
+        <EditorContent
+          editor={editor}
+          aria-invalid={fieldError ? "true" : "false"}
+          aria-describedby={fieldError ? fieldErrorId : undefined}
+        />
+      </ScrollArea>
     </div>
   );
 }
